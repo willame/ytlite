@@ -4,43 +4,45 @@ enum DirectPlaybackClient: Equatable, CustomStringConvertible {
     case androidVR
     case web
 
-    var description: String { clientName }
+    var description: String {
+        clientName
+    }
 
     var clientName: String {
         switch self {
         case .androidVR:
-            return "ANDROID_VR"
+            "ANDROID_VR"
         case .web:
-            return "WEB"
+            "WEB"
         }
     }
 
     var clientVersion: String {
         switch self {
         case .androidVR:
-            return "1.65.10"
+            "1.65.10"
         case .web:
-            return "2.20231121.08.00"
+            "2.20231121.08.00"
         }
     }
 
     var clientHeaderName: String {
         switch self {
         case .androidVR:
-            return "28"
+            "28"
         case .web:
-            return "1"
+            "1"
         }
     }
 
     var userAgent: String {
         switch self {
         case .androidVR:
-            return "com.google.android.apps.youtube.vr.oculus/"
+            "com.google.android.apps.youtube.vr.oculus/"
                 + "1.65.10 (Linux; U; Android 12L;"
                 + " eureka-user Build/SQ3A.220605.009.A1) gzip"
         case .web:
-            return UserAgent.chromeMac
+            UserAgent.chromeMac
         }
     }
 
@@ -48,9 +50,9 @@ enum DirectPlaybackClient: Equatable, CustomStringConvertible {
     var usesCookieAuth: Bool {
         switch self {
         case .androidVR:
-            return true
+            true
         case .web:
-            return false
+            false
         }
     }
 
@@ -59,21 +61,30 @@ enum DirectPlaybackClient: Equatable, CustomStringConvertible {
         true
     }
 
+    var pipelineStrategy: PlaybackPipelineStrategy {
+        switch self {
+        case .androidVR:
+            AndroidVRPipelineStrategy()
+        case .web:
+            WebClientPipelineStrategy()
+        }
+    }
+
     var context: [String: Any] {
         switch self {
         case .androidVR:
-            return InnertubeContexts.androidVR
+            InnertubeContexts.androidVR
         case .web:
-            return InnertubeContexts.web
+            InnertubeContexts.web
         }
     }
 
     var playerURLSuffix: String {
         switch self {
         case .androidVR:
-            return "?prettyPrint=false"
+            "?prettyPrint=false"
         case .web:
-            return ""
+            ""
         }
     }
 

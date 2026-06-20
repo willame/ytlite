@@ -3,6 +3,7 @@ import AVKit
 import UIKit
 
 // MARK: - Playback
+
 extension WatchViewController {
     func startPlayback() {
         playbackFacade.watchtimeTracker.timeProvider = { [weak self] in
@@ -14,6 +15,7 @@ extension WatchViewController {
             cancellationToken: pageLoadToken
         )
     }
+
     func prepareDirectPlaybackURL(
         baseURL: URL,
         client: DirectPlaybackClient,
@@ -41,6 +43,7 @@ extension WatchViewController {
         components.queryItems = items
         return components.url ?? baseURL
     }
+
     func attachComposedPlayer(
         videoURL: URL,
         audioURL: URL,
@@ -56,10 +59,11 @@ extension WatchViewController {
                 completion(false)
                 return
             }
-            self.attachPlayer(item: item)
+            attachPlayer(item: item)
             completion(true)
         }
     }
+
     func prepareAdaptiveUpgrade(
         videoURL: URL,
         audioURL: URL,
@@ -74,12 +78,13 @@ extension WatchViewController {
             guard let self, let item else {
                 return
             }
-            self.performAdaptiveSwitch(
+            performAdaptiveSwitch(
                 item: item,
                 quality: quality
             )
         }
     }
+
     func performAdaptiveSwitch(
         item: AVPlayerItem,
         quality: String
@@ -107,6 +112,7 @@ extension WatchViewController {
             "adaptive upgrade: switched to \(quality)"
         )
     }
+
     // swiftlint:disable:next function_parameter_count
     func buildHLSAndPlay(
         videoURL: URL,
@@ -160,6 +166,7 @@ extension WatchViewController {
             )
         }
     }
+
     func fallbackToProgressivePlayback() {
         AppLog.player(
             "HLS: falling back to progressive + adaptive upgrade"
@@ -170,9 +177,11 @@ extension WatchViewController {
             )
         }
     }
+
     func attachPlayer(url: URL) {
         attachPlayer(item: AVPlayerItem(url: url))
     }
+
     func attachDirectPlayer(
         url: URL,
         visitorData: String?,
@@ -195,12 +204,14 @@ extension WatchViewController {
         let asset = AVURLAsset(url: url, options: opts)
         attachPlayer(item: AVPlayerItem(asset: asset))
     }
+
     func makeDirectRequestHeaders(
         visitorData: String?,
         client: DirectPlaybackClient
     ) -> [String: String] {
         client.streamHeaders(visitorData: visitorData)
     }
+
     func attachPlayer(
         item: AVPlayerItem,
         minimizeStalling: Bool = true
@@ -224,6 +235,7 @@ extension WatchViewController {
         pv.attach(player: player)
         player.play()
     }
+
     func getOrCreatePlayerView() -> VideoPlayerView {
         if let existing = videoPlayerView {
             return existing
@@ -247,6 +259,7 @@ extension WatchViewController {
         }
         return playerView
     }
+
     func configureSponsorBlock(
         on playerView: VideoPlayerView
     ) {
@@ -265,6 +278,7 @@ extension WatchViewController {
             )
         }
     }
+
     func resetPlaybackSurfaces() {
         videoPlayerView?.player?.pause()
         if let existing =

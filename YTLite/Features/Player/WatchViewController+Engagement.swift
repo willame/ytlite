@@ -1,6 +1,7 @@
 import UIKit
 
 // MARK: - Engagement & Actions
+
 extension WatchViewController {
     // MARK: - App Lifecycle
 
@@ -10,28 +11,35 @@ extension WatchViewController {
         AppLog.player(
             "appDidEnterBackground: bgEnabled=\(bgEnabled)"
         )
+        backgroundEnteredAt = Date()
         guard bgEnabled else {
             videoPlayerView?.player?.pause()
             return
         }
-        // If PiP is active, leave playerLayer connected — PiP needs it.
         let pipActive = videoPlayerView?.pipController?
             .isPictureInPictureActive == true
         if pipActive {
             return
         }
-        // Disconnect the video layer so iOS doesn't pause the
-        // player when rendering stops. Audio continues via
-        // AVAudioSession .playback category.
         videoPlayerView?.playerLayer.player = nil
     }
 
     @objc
     func appWillEnterForeground() {
         AppLog.player("appWillEnterForeground")
-        // Reconnect the video layer to resume rendering.
+        let elapsed = backgroundEnteredAt.map {
+            Date().timeIntervalSince($0)
+        } ?? 0
+        backgroundEnteredAt = nil
         if let player = videoPlayerView?.player {
             videoPlayerView?.playerLayer.player = player
+        }
+        if elapsed > 120, hasSeenPlaybackError {
+            AppLog.player(
+                "foreground: URLs likely expired"
+                    + " (\(Int(elapsed))s in bg), recovering"
+            )
+            recoverPlayback()
         }
     }
 
@@ -138,7 +146,7 @@ extension WatchViewController {
                             value: rydVal
                         )
                 }
-            case .failure(let error):
+            case let .failure(error):
                 AppLog.player(
                     "\(label) failed for \(videoId): \(error)"
                 )
@@ -169,7 +177,7 @@ extension WatchViewController {
                             value: rydVal
                         )
                 }
-            case .failure(let error):
+            case let .failure(error):
                 AppLog.player(
                     "\(label) failed for \(videoId): \(error)"
                 )

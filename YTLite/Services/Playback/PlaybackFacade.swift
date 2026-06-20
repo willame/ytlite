@@ -55,11 +55,14 @@ final class PlaybackFacade {
     var backgroundEnteredAt: Date?
     var backgroundPlaybackMode: BackgroundPlaybackMode = .inline
     var playlistSwitchBackgroundTask: UIBackgroundTaskIdentifier = .invalid
-    private var activeDirectPlaybackClient: DirectPlaybackClient = .androidVR
+    var activeDirectPlaybackClient: DirectPlaybackClient = .androidVR
     var backgroundAudioObservation: NSKeyValueObservation?
     let watchtimeTracker = WatchtimeTracker()
     var currentVideoId: String?
     weak var currentApiClient: WatchService?
+
+    /// Whether playback was active before backgrounding.
+    var pendingRestorePlayback = false
 
     static func makeContentPlaybackNonce(
         length: Int = 16
@@ -67,7 +70,7 @@ final class PlaybackFacade {
         let chars = "abcdefghijklmnopqrstuvwxyz"
             + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
         return String(
-            (0..<length).compactMap { _ in
+            (0 ..< length).compactMap { _ in
                 Array(chars).randomElement()
             }
         )
@@ -111,5 +114,6 @@ extension PlaybackFacade {
         watchtimeTracker.stop()
         currentVideoId = nil
         currentApiClient = nil
+        pendingRestorePlayback = false
     }
 }

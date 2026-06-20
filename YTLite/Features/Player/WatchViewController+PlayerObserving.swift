@@ -1,7 +1,8 @@
-import UIKit
 import AVKit
+import UIKit
 
 // MARK: - Player Observing
+
 extension WatchViewController {
     func startObservingPlayerItem(_ item: AVPlayerItem) {
         statusObservation = item.observe(
@@ -78,6 +79,9 @@ extension WatchViewController {
     }
 
     func logReadyToPlay(_ item: AVPlayerItem) {
+        if applyRecoverySeekIfNeeded(item) {
+            return
+        }
         let duration = CMTimeGetSeconds(item.duration)
         let tracks = item.tracks
             .map {
@@ -135,12 +139,23 @@ extension WatchViewController {
                 + " code=\(code)"
         )
         logUnderlyingError(nsError)
+        if code == -12_660
+            || domain == "CoreMediaErrorDomain" {
+            hasSeenPlaybackError = true
+            if !isRecoveringPlayback {
+                AppLog.player(
+                    "player failure — scheduling recovery"
+                )
+                recoverPlayback()
+            }
+        }
     }
 
     func logUnderlyingError(_ nsError: NSError?) {
         guard let underlying = nsError?
             .userInfo[NSUnderlyingErrorKey]
-            as? NSError else {
+            as? NSError
+        else {
             return
         }
         AppLog.player(
@@ -163,6 +178,10 @@ extension WatchViewController {
         AppLog.player(
             "player item failed to end: \(error)"
         )
+        hasSeenPlaybackError = true
+        if !isRecoveringPlayback {
+            recoverPlayback()
+        }
     }
 
     @objc
@@ -170,7 +189,8 @@ extension WatchViewController {
         _ notification: Notification
     ) {
         guard let nextVideo =
-            watchPage?.nextVideo else {
+            watchPage?.nextVideo
+        else {
             return
         }
         DispatchQueue.main.async { [weak self] in
@@ -184,8 +204,9 @@ extension WatchViewController {
     ) {
         guard let item =
             note.object as? AVPlayerItem,
-              let events = item.errorLog()?.events,
-              let last = events.last else {
+            let events = item.errorLog()?.events,
+            let last = events.last
+        else {
             AppLog.player(
                 "player item new error log entry"
             )
@@ -201,6 +222,15 @@ extension WatchViewController {
                 + " comment=\(comment),"
                 + " uri=\(uri)"
         )
+        if last.errorStatusCode == 403 {
+            hasSeenPlaybackError = true
+            if !isRecoveringPlayback {
+                AppLog.player(
+                    "403 detected — scheduling recovery"
+                )
+                recoverPlayback()
+            }
+        }
     }
 
     func showPlaybackError(_ message: String) {
@@ -211,86 +241,5 @@ extension WatchViewController {
             self?.playerStatusLabel.textColor =
                 .systemRed
         }
-    }
-
-    // MARK: - Autoplay
-
-    func showAutoplayOverlay(for video: Video) {
-        autoplayOverlay?.removeFromSuperview()
-        let overlay = makeAutoplayOverlay(for: video)
-        // playerView may be in the window via EITHER fullscreen path
-        // (rotation-based for iPhone or tap-based for iPad/portrait).
-        // Use isFullscreen to detect both cases.
-        if let pv = videoPlayerView, pv.isFullscreen {
-            overlay.translatesAutoresizingMaskIntoConstraints = true
-            overlay.frame = pv.bounds
-            overlay.autoresizingMask = [
-                .flexibleWidth, .flexibleHeight
-            ]
-            pv.addSubview(overlay)
-        } else {
-            overlay
-                .translatesAutoresizingMaskIntoConstraints
-                = false
-            playerContainer.addSubview(overlay)
-            applyEdgeConstraints(overlay, to: playerContainer)
-        }
-        autoplayOverlay = overlay
-        UIView.animate(withDuration: 0.25) {
-            overlay.alpha = 1
-        }
-        overlay.startCountdown()
-    }
-
-    private func makeAutoplayOverlay(
-        for video: Video
-    ) -> AutoplayOverlayView {
-        let overlay = AutoplayOverlayView(
-            nextVideo: video,
-            countdownSecs: 5
-        )
-        overlay.alpha = 0
-        overlay.onPlay = { [weak self] in
-            self?.dismissAutoplayOverlay()
-            self?.navigateTo(video)
-        }
-        overlay.onCancel = { [weak self] in
-            self?.dismissAutoplayOverlay()
-        }
-        return overlay
-    }
-
-    func applyEdgeConstraints(
-        _ child: UIView,
-        to parent: UIView
-    ) {
-        NSLayoutConstraint.activate([
-            child.topAnchor.constraint(
-                equalTo: parent.topAnchor
-            ),
-            child.leadingAnchor.constraint(
-                equalTo: parent.leadingAnchor
-            ),
-            child.trailingAnchor.constraint(
-                equalTo: parent.trailingAnchor
-            ),
-            child.bottomAnchor.constraint(
-                equalTo: parent.bottomAnchor
-            )
-        ])
-    }
-
-    func dismissAutoplayOverlay() {
-        guard let overlay = autoplayOverlay else {
-            return
-        }
-        autoplayOverlay = nil
-        UIView.animate(
-            withDuration: 0.2,
-            animations: { overlay.alpha = 0 },
-            completion: { _ in
-                overlay.removeFromSuperview()
-            }
-        )
     }
 }

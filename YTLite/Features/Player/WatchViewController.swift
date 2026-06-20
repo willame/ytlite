@@ -1,5 +1,5 @@
-import UIKit
 import AVKit
+import UIKit
 
 private func makePortraitRelatedLayout() -> UICollectionViewFlowLayout {
     let layout = UICollectionViewFlowLayout()
@@ -38,7 +38,8 @@ final class WatchViewController: UIViewController {
     let channelViewControllerFactory: (
         String,
         String
-    ) -> ChannelViewController
+    )
+        -> ChannelViewController
     let videoRouter: VideoRouter
     let cache = AppCache.shared
 
@@ -66,6 +67,10 @@ final class WatchViewController: UIViewController {
     var didSeekToSavedPosition = false
     var captionTracks: [SubtitleTrack] = []
     var activeSubtitleLanguage: String?
+    var backgroundEnteredAt: Date?
+    var isRecoveringPlayback = false
+    var hasSeenPlaybackError = false
+    var recoveryTargetSeconds: Double?
 
     // MARK: - UI Elements
 
@@ -163,22 +168,23 @@ final class WatchViewController: UIViewController {
         channelViewControllerFactory: @escaping (
             String,
             String
-        ) -> ChannelViewController,
+        )
+            -> ChannelViewController,
         videoRouter: VideoRouter = .shared
     ) {
         let portraitLayout = makePortraitRelatedLayout()
-        self.portraitRelatedLayout = portraitLayout
+        portraitRelatedLayout = portraitLayout
 
         let landscapeLayout = makeLandscapeRelatedLayout()
-        self.landscapeRelatedLayout = landscapeLayout
+        landscapeRelatedLayout = landscapeLayout
 
-        self.relatedCollectionView = UICollectionView(
+        relatedCollectionView = UICollectionView(
             frame: .zero,
             collectionViewLayout: portraitLayout
         )
-        self.initialVideo = video
-        self.client = watchService
-        self.engagementClient = engagementService
+        initialVideo = video
+        client = watchService
+        engagementClient = engagementService
         self.channelInfoStore = channelInfoStore
         self.channelViewControllerFactory = channelViewControllerFactory
         self.videoRouter = videoRouter
@@ -233,7 +239,7 @@ final class WatchViewController: UIViewController {
     override func viewWillTransition(
         to size: CGSize,
         with coordinator:
-            UIViewControllerTransitionCoordinator
+        UIViewControllerTransitionCoordinator
     ) {
         super.viewWillTransition(
             to: size,
@@ -246,14 +252,14 @@ final class WatchViewController: UIViewController {
                 }
                 // While in fullscreen the player view lives directly in the
                 // window; keep its frame in sync with the rotating window.
-                if self.fullscreenSnapshot != nil,
-                   let window = self.view.window {
-                    self.videoPlayerView?.frame = window.bounds
-                    self.videoPlayerView?.setNeedsLayout()
+                if fullscreenSnapshot != nil,
+                   let window = view.window {
+                    videoPlayerView?.frame = window.bounds
+                    videoPlayerView?.setNeedsLayout()
                 } else {
-                    self.updateLayoutForSize(size)
+                    updateLayoutForSize(size)
                 }
-                self.view.layoutIfNeeded()
+                view.layoutIfNeeded()
             },
             completion: { [weak self] _ in
                 self?.updateLayoutForSize()

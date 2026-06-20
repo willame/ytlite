@@ -5,30 +5,17 @@ extension PlaybackFacade {
     func fetchPoTokenAndPlay(
         _ ctx: PlaybackPipelineContext
     ) {
-        let cancel = ctx.cancellationToken
-        WebPoTokenService.shared.fetchSessionToken(
-            identifier: ctx.videoId
-        ) { [weak self] tokenResult in
-            guard let self, !cancel.isCancelled else {
-                return
-            }
-            let poToken: String?
-            switch tokenResult {
-            case .success(let token):
-                poToken = token
-            case .failure(let error):
-                AppLog.player(
-                    "PoToken failed: \(error)"
-                )
-                poToken = nil
-            }
-            DispatchQueue.main.async {
-                self.context?.updateStatusLabel(
-                    "Resolving direct stream..."
-                )
-            }
-            self.fetchDirectPlayback(
-                poToken: poToken,
+        DispatchQueue.main.async {
+            self.context?.updateStatusLabel(
+                "Resolving direct stream..."
+            )
+        }
+        let strategy = ctx.client.pipelineStrategy
+        strategy.fetchAuthToken(
+            videoId: ctx.videoId
+        ) { [weak self] token in
+            self?.fetchDirectPlayback(
+                poToken: token,
                 pipelineContext: ctx
             )
         }
@@ -69,10 +56,14 @@ extension PlaybackFacade {
             return
         }
         logSabrInfo(info, client: ctx.client)
-        guard let visitorData = info.visitorData,
+        let strategy = ctx.client.pipelineStrategy
+        guard strategy.shouldTryOnesieFallback(
+            info: info
+        ),
+              let visitorData = info.visitorData,
               !visitorData.isEmpty else {
             context?.showPlaybackError(
-                "Missing visitor data for onesie."
+                "No playable streams available."
             )
             return
         }

@@ -37,7 +37,7 @@ final class WebPoTokenService: NSObject {
     static let shared = WebPoTokenService()
 
     let requestKey = "O43z0dpjhgX20SCx4KAo"
-    let mintTimeout: TimeInterval = 15
+    let mintTimeout: TimeInterval = 5
     let maxRetryCount = 1
     let tokenCacheLifetime: TimeInterval =
         60 * 60 * 10
@@ -177,8 +177,8 @@ extension WebPoTokenService {
     func runMint(identifier: String) {
         guard let idLit =
             jsStringLiteral(identifier),
-              let keyLit =
-                  jsStringLiteral(requestKey)
+            let keyLit =
+            jsStringLiteral(requestKey)
         else {
             failMint(identifier: identifier)
             return
@@ -229,13 +229,13 @@ extension WebPoTokenService {
             guard let self else {
                 return
             }
-            let secs = Int(self.mintTimeout)
-            self.resolve(
+            let secs = Int(mintTimeout)
+            resolve(
                 identifier: identifier,
                 result: .failure(
                     ServiceError.timedOut(
                         "WebPO mint timed out "
-                        + "after \(secs)s"
+                            + "after \(secs)s"
                     )
                 )
             )
@@ -255,10 +255,10 @@ extension WebPoTokenService {
                 withJSONObject: [value],
                 options: []
             ),
-              let json = String(
-                  data: data, encoding: .utf8
-              ),
-              json.count >= 2
+            let json = String(
+                data: data, encoding: .utf8
+            ),
+            json.count >= 2
         else {
             return nil
         }
