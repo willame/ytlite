@@ -42,11 +42,30 @@ Install the `.ipa` package directly:
 
 ### Non-jailbroken devices
 
-Sideload the `.ipa` via **AltStore** or **SideStore**.
+**Option 1 — Add source (recommended)**
 
-To build the IPA yourself:
+Add the YTLite source to your sideloading app to receive automatic updates:
+
+- [**Add to SideStore**](sidestore://source?url=https%3A%2F%2Fraw.githubusercontent.com%2Fverback2308%2FYTLite%2Fmain%2Fsource%2Fapps.json)
+- [**Add to AltStore**](altstore-classic://source?url=https%3A%2F%2Fraw.githubusercontent.com%2Fverback2308%2FYTLite%2Fmain%2Fsource%2Fapps.json)
+- [**Add to LiveContainer**](livecontainer://source?url=https%3A%2F%2Fraw.githubusercontent.com%2Fverback2308%2FYTLite%2Fmain%2Fsource%2Fapps.json)
+
+If the LiveContainer link doesn't open automatically, copy and paste this URL in the "Add Manually" field:
+
+```
+https://raw.githubusercontent.com/verback2308/YTLite/main/source/apps.json
+```
+
+**Option 2 — Manual install**
+
+Download the IPA and install via **SideStore**, **AltStore**, or **LiveContainer**.
+
+**Option 3 — Build from source**
 
 ```bash
+git clone https://github.com/verback2308/YTLite.git
+cd YTLite
+cp Config/Local.xcconfig.example Config/Local.xcconfig
 ./make_ipa.sh
 ```
 
