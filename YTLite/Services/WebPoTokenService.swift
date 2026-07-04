@@ -48,6 +48,7 @@ final class WebPoTokenService: NSObject {
     let queue = DispatchQueue(
         label: "com.ytvlite.webpo-token-service"
     )
+    let transport: HTTPTransport = ServiceContainer.transport
     var tokenCache: [String: CachedToken] = [:]
     var pending: [String: [PendingRequest]] = [:]
     var timeoutWorkItems: [String: DispatchWorkItem] =

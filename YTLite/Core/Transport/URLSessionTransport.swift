@@ -57,6 +57,9 @@ final class URLSessionTransport: HTTPTransport {
         var urlRequest = URLRequest(url: request.url)
         urlRequest.httpMethod = request.method.rawValue
         urlRequest.httpBody = request.body
+        if let timeout = request.timeout {
+            urlRequest.timeoutInterval = timeout
+        }
         request.headers.forEach {
             urlRequest.setValue($1, forHTTPHeaderField: $0)
         }

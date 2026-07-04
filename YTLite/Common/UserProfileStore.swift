@@ -10,8 +10,11 @@ final class UserProfileStore {
     private(set) var displayName: String?
     private var accountService: AccountService?
     private var isLoading = false
+    private let transport: HTTPTransport
 
-    private init() {}
+    init(transport: HTTPTransport = ServiceContainer.mediaTransport) {
+        self.transport = transport
+    }
 
     func configure(accountService: AccountService) {
         self.accountService = accountService
@@ -53,22 +56,23 @@ final class UserProfileStore {
             }
             return
         }
-        let task = URLSession.shared
-            .dataTask(with: avatarURL) { [weak self] data, _, _ in
-                guard let self
-                else { return }
-                self.isLoading = false
-                if let data, let img = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self.avatarImage = img
-                        NotificationCenter.default.post(
-                            name: Self.didUpdateNotification,
-                            object: nil
-                        )
-                    }
+        transport.send(
+            HTTPRequest(method: .get, url: avatarURL),
+            cancellationToken: nil
+        ) { [weak self] result in
+            guard let self
+            else { return }
+            self.isLoading = false
+            if let data = try? result.get().data, let img = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self.avatarImage = img
+                    NotificationCenter.default.post(
+                        name: Self.didUpdateNotification,
+                        object: nil
+                    )
                 }
             }
-        task.resume()
+        }
     }
 
     func clear() {

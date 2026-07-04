@@ -8,8 +8,11 @@ final class SubtitleService {
     private let queue = DispatchQueue(
         label: "com.verback.YTLite.subtitles"
     )
+    private let transport: HTTPTransport
 
-    private init() {}
+    init(transport: HTTPTransport = ServiceContainer.transport) {
+        self.transport = transport
+    }
 
     func load(
         track: SubtitleTrack,
@@ -56,21 +59,17 @@ final class SubtitleService {
     }
 
     private func performFetch(url: URL) {
-        let task = URLSession.shared.dataTask(
-            with: url
-        ) { [weak self] data, response, _ in
-            let http = (response as? HTTPURLResponse)?.statusCode ?? 0
-            self?.handleFetchResponse(
-                url: url, data: data, status: http
-            )
+        transport.send(
+            HTTPRequest(method: .get, url: url),
+            cancellationToken: nil
+        ) { [weak self] result in
+            self?.handleFetchResponse(url: url, data: try? result.get().data)
         }
-        task.resume()
     }
 
     private func handleFetchResponse(
         url: URL,
-        data: Data?,
-        status: Int
+        data: Data?
     ) {
         let cues: [SubtitleCue]
         if let data,

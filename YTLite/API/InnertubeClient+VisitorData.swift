@@ -113,47 +113,51 @@ extension InnertubeClient {
         cancellationToken: CancellationToken? = nil,
         completion: @escaping (String?) -> Void
     ) {
-        guard let request = buildVisitorRequest(videoId: videoId) else {
+        guard let parts = visitorRequestParts(videoId: videoId) else {
             completion(nil)
             return
         }
-        let task = URLSession.shared.dataTask(with: request) { data, _, error in
-            if let error {
+        setInitialCookies()
+        api.get(
+            url: parts.url,
+            headers: parts.headers,
+            cancellationToken: cancellationToken
+        ) { result in
+            switch result {
+            case .failure(let error):
                 if (error as NSError).code != NSURLErrorCancelled {
                     AppLog.innertube(
                         "visitor data fetch failed: \(error.localizedDescription)"
                     )
                 }
                 completion(nil)
-                return
+            case .success(let data):
+                Self.logPreflightCookies()
+                let extracted = Self.extractVisitorData(from: data)
+                if extracted == nil {
+                    Self.logVisitorCookies()
+                }
+                completion(extracted)
             }
-            Self.logPreflightCookies()
-            let extracted = Self.extractVisitorData(from: data)
-            if extracted == nil {
-                Self.logVisitorCookies()
-            }
-            completion(extracted)
         }
-        cancellationToken?.register(task)
-        task.resume()
     }
 
-    func buildVisitorRequest(videoId: String) -> URLRequest? {
+    func visitorRequestParts(
+        videoId: String
+    ) -> (url: URL, headers: [String: String])? {
         let base = "https://www.youtube.com/watch"
         let qs = "?v=\(videoId)&bpctr=9999999999&has_verified=1"
         guard let url = URL(string: base + qs) else {
             return nil
         }
         AppLog.innertube("fetching visitor data for \(videoId)...")
-        var request = URLRequest(url: url)
-        request.setValue(UserAgent.chromeDesktopPlayback, forHTTPHeaderField: HTTPHeader.userAgent)
-        request.setValue(
-            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            forHTTPHeaderField: HTTPHeader.accept
-        )
-        request.setValue("en-us,en;q=0.5", forHTTPHeaderField: HTTPHeader.acceptLanguage)
-        setInitialCookies()
-        return request
+        let headers = [
+            HTTPHeader.userAgent: UserAgent.chromeDesktopPlayback,
+            HTTPHeader.accept:
+                "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            HTTPHeader.acceptLanguage: "en-us,en;q=0.5"
+        ]
+        return (url, headers)
     }
 
     func setInitialCookies() {

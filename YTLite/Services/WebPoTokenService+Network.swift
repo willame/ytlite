@@ -19,30 +19,27 @@ extension WebPoTokenService {
             )
             return
         }
-        let task = URLSession.shared.dataTask(
-            with: request
-        ) { [self] data, response, error in
-            if let error {
+        transport.send(request, cancellationToken: nil) { [self] result in
+            switch result {
+            case .failure(let error):
                 logAndFailGenerateIT(
                     identifier: identifier,
-                    reason: error
-                        .localizedDescription
+                    reason: error.localizedDescription
                 )
-                return
+            case .success(let response):
+                handleGenerateITSuccess(
+                    identifier: identifier,
+                    attemptID: attemptID,
+                    data: response.data,
+                    status: response.status
+                )
             }
-            handleGenerateITSuccess(
-                identifier: identifier,
-                attemptID: attemptID,
-                data: data,
-                response: response
-            )
         }
-        task.resume()
     }
 
     private func buildGenerateITRequest(
         botguardResponse: String
-    ) -> URLRequest? {
+    ) -> HTTPRequest? {
         let urlStr =
             "https://jnn-pa.googleapis.com"
             + "/$rpc/google.internal.waa.v1.Waa"
@@ -50,40 +47,27 @@ extension WebPoTokenService {
         guard let url = URL(string: urlStr) else {
             return nil
         }
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.timeoutInterval = 8
-        setGenerateITHeaders(on: &req)
         let obj = [requestKey, botguardResponse]
-        guard let body =
-            try? JSONSerialization.data(
-                withJSONObject: obj, options: []
-            )
-        else {
+        guard let body = try? JSONSerialization.data(
+            withJSONObject: obj, options: []
+        ) else {
             return nil
         }
-        req.httpBody = body
-        return req
+        return HTTPRequest(
+            method: .post,
+            url: url,
+            headers: generateITHeaders(),
+            body: body,
+            timeout: 8
+        )
     }
 
-    private func setGenerateITHeaders(
-        on req: inout URLRequest
-    ) {
-        req.setValue(
-            "application/json+protobuf",
-            forHTTPHeaderField:
-                HTTPHeader.contentType
-        )
-        req.setValue(
-            YouTubeCredentials.tvApiKey,
-            forHTTPHeaderField:
-                HTTPHeader.xGoogApiKey
-        )
-        req.setValue(
-            "grpc-web-javascript/0.1",
-            forHTTPHeaderField:
-                HTTPHeader.xUserAgent
-        )
+    private func generateITHeaders() -> [String: String] {
+        [
+            HTTPHeader.contentType: "application/json+protobuf",
+            HTTPHeader.xGoogApiKey: YouTubeCredentials.tvApiKey,
+            HTTPHeader.xUserAgent: "grpc-web-javascript/0.1"
+        ]
     }
 }
 
@@ -94,16 +78,10 @@ extension WebPoTokenService {
         identifier: String,
         attemptID: String?,
         data: Data?,
-        response: URLResponse?
+        status: Int
     ) {
-        if let http = response
-            as? HTTPURLResponse {
-            AppLog.poToken(
-                "generate_it:native:status "
-                + "\(http.statusCode)"
-            )
-        }
-        guard let data else {
+        AppLog.poToken("generate_it:native:status \(status)")
+        guard let data, !data.isEmpty else {
             logAndFailGenerateIT(
                 identifier: identifier,
                 reason: "No data"

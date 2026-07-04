@@ -8,6 +8,10 @@ enum ServiceContainer {
         AuthorizingTransport(URLSessionTransport())
     )
 
+    /// Undecorated transport for the high-volume media plane (images, avatars):
+    /// no per-request logging spam and no auth (these requests are anonymous).
+    static let mediaTransport: HTTPTransport = URLSessionTransport()
+
     // Single InnertubeClient instance shared across all service protocols.
     // Each property is typed to the narrowest protocol the caller needs — DIP in action.
     private static let client = InnertubeClient(transport: transport)

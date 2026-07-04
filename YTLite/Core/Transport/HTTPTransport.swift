@@ -12,17 +12,21 @@ struct HTTPRequest {
     var url: URL
     var headers: [String: String]
     var body: Data?
+    /// Per-request timeout; nil uses the session default.
+    var timeout: TimeInterval?
 
     init(
         method: HTTPMethod,
         url: URL,
         headers: [String: String] = [:],
-        body: Data? = nil
+        body: Data? = nil,
+        timeout: TimeInterval? = nil
     ) {
         self.method = method
         self.url = url
         self.headers = headers
         self.body = body
+        self.timeout = timeout
     }
 }
 
