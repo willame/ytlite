@@ -64,20 +64,4 @@ extension PlaybackFacade {
                 + " sabr=\(sabr)"
         )
     }
-
-    func logOnesieBootstrap(
-        _ bootstrap: OnesiePlaybackBootstrap
-    ) {
-        let types = bootstrap.responseParts
-            .map {
-                "\($0.type)(c\($0.compressionType))"
-            }
-            .joined(separator: ",")
-        AppLog.player(
-            "onesie bootstrap ready"
-                + " proxy=\(bootstrap.proxyStatus)"
-                + " http=\(bootstrap.httpStatus)"
-                + " parts=[\(types)]"
-        )
-    }
 }

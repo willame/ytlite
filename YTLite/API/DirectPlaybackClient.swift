@@ -61,15 +61,6 @@ enum DirectPlaybackClient: Equatable, CustomStringConvertible {
         true
     }
 
-    var pipelineStrategy: PlaybackPipelineStrategy {
-        switch self {
-        case .androidVR:
-            AndroidVRPipelineStrategy()
-        case .web:
-            WebClientPipelineStrategy()
-        }
-    }
-
     var context: [String: Any] {
         switch self {
         case .androidVR:

@@ -51,12 +51,3 @@ protocol PlaybackContext: AnyObject {
     func stopObservingPlayerItem(_ item: AVPlayerItem)
     func setCaptionTracks(_ tracks: [SubtitleTrack])
 }
-
-// MARK: - PlaybackStrategy
-
-/// A single playback strategy. Strategies are tried in priority order by
-/// PlaybackStrategySelector; the first one whose canHandle(_:) returns true is used.
-protocol PlaybackStrategy {
-    func canHandle(_ info: DirectPlaybackInfo) -> Bool
-    func play(_ info: DirectPlaybackInfo, client: DirectPlaybackClient, context: PlaybackContext)
-}

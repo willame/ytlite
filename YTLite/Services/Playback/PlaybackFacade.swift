@@ -28,13 +28,6 @@ struct PlaybackPipelineContext {
     let apiClient: WatchService
 }
 
-struct OnesieContext {
-    let originalInfo: DirectPlaybackInfo
-    let client: DirectPlaybackClient
-    let contentPoToken: String
-    let contentPlaybackNonce: String
-}
-
 enum BackgroundPlaybackMode {
     case inline
     case audioOnlyHLS
