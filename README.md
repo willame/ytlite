@@ -100,20 +100,23 @@ Select the **YTVLite** scheme, choose your device or simulator, and build (⌘B)
 
 ```
 YTLite/
-├── API/              YouTube Innertube API client
-├── Auth/             OAuth device-code flow
-├── Common/           Shared UI components & utilities
-├── Config/           URLs, UserDefaults keys, constants
-├── Extensions/       Swift extensions
-├── Features/
-│   ├── Channel/      Channel page with tabs
-│   ├── Home/         Home feed
-│   ├── Library/      Playlists & saved videos
-│   ├── Player/       Video player & watch page
-│   ├── Profile/      User profile
-│   ├── Search/       Search with suggestions
-│   └── Subscriptions/ Subscription feed
-└── Services/         Business logic & playback
+├── App/              Composition root: AppDelegate, DI wiring, tab bar
+├── Core/             Shared kernel (features depend on it, never on each other)
+│   ├── API/          YouTube Innertube API client
+│   ├── Auth/         OAuth device-code flow
+│   ├── Config/       URLs, UserDefaults keys, constants
+│   ├── Transport/    HTTP abstraction + decorators
+│   ├── Playback/     VideoSource contracts, sources, HLS machinery
+│   ├── Services/     Caching, SponsorBlock, RYD, subtitles, watchtime
+│   └── Common/       Shared UI components & utilities
+└── Features/         One vertical slice per feature
+    ├── Channel/      Channel page with tabs
+    ├── Home/         Home feed
+    ├── Library/      Playlists & saved videos
+    ├── Player/       Video player & watch page
+    ├── Profile/      User profile
+    ├── Search/       Search with suggestions
+    └── Subscriptions/ Subscription feed
 ```
 
 ### Key Design Decisions

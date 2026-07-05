@@ -5,7 +5,7 @@ class SearchViewController: UIViewController {
     private let channelViewControllerFactory: (
         String,
         String
-    ) -> ChannelViewController
+    ) -> UIViewController
     private let videoRouter: VideoRouter
     private var results: [Video] = []
     private var lastQuery: String = ""
@@ -21,7 +21,7 @@ class SearchViewController: UIViewController {
         channelViewControllerFactory: @escaping (
             String,
             String
-        ) -> ChannelViewController,
+        ) -> UIViewController,
         videoRouter: VideoRouter = .shared
     ) {
         self.service = service

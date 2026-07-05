@@ -58,6 +58,8 @@ struct AppDependencies {
             channelService: channelService,
             feedService: feedService,
             engagementService: engagementService,
+            channelTabService: channelTabService,
+            playlistService: playlistService,
             channelViewControllerFactory: makeChannelViewController
         )
     }

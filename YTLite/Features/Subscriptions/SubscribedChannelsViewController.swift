@@ -7,7 +7,7 @@ final class SubscribedChannelsViewController: UIViewController {
     private let channelViewControllerFactory: (
         String,
         String
-    ) -> ChannelViewController
+    ) -> UIViewController
     private let tableView = UITableView()
 
     init(
@@ -15,7 +15,7 @@ final class SubscribedChannelsViewController: UIViewController {
         channelViewControllerFactory: @escaping (
             String,
             String
-        ) -> ChannelViewController
+        ) -> UIViewController
     ) {
         self.channels = channels
         self.channelViewControllerFactory = channelViewControllerFactory

@@ -3,6 +3,8 @@ import UIKit
 class ThumbnailImageView: UIImageView {
     static let cache = ImageMemoryCache()
     static let diskCache = ImageDiskCache()
+    /// Injectable transport for image fetches (media plane, undecorated).
+    static var transport: HTTPTransport = ServiceContainer.mediaTransport
 
     static var cachingEnabled: Bool {
         UserDefaults.standard.object(
@@ -141,7 +143,7 @@ class ThumbnailImageView: UIImageView {
         let maxSz = maxPixelSize
         let token = CancellationToken()
         loadToken = token
-        ServiceContainer.mediaTransport.send(
+        Self.transport.send(
             HTTPRequest(method: .get, url: url),
             cancellationToken: token
         ) { [weak self] result in

@@ -63,7 +63,7 @@ extension ChannelViewController {
 
     func loadVideoTab(params: String) {
         let expectedTab = currentTab
-        ServiceContainer.channelTabs.fetchChannelTab(
+        tabsClient.fetchChannelTab(
             channelId: channelId,
             params: params
         ) { [weak self] result in
@@ -79,7 +79,7 @@ extension ChannelViewController {
 
     func loadPlaylistTab() {
         let expectedTab = currentTab
-        ServiceContainer.channelTabs.fetchChannelPlaylists(
+        tabsClient.fetchChannelPlaylists(
             channelId: channelId,
             params: ChannelTabParams.playlists
         ) { [weak self] result in
@@ -138,7 +138,7 @@ extension ChannelViewController {
 
     func loadMoreVideos(continuation: String) {
         let expectedTab = currentTab
-        ServiceContainer.channelTabs.fetchChannelTabNextPage(
+        tabsClient.fetchChannelTabNextPage(
             continuation: continuation
         ) { [weak self] result in
             DispatchQueue.main.async {
@@ -165,7 +165,7 @@ extension ChannelViewController {
         spinner.startAnimating()
         isLoadingInitial = true
         collectionView?.reloadData()
-        ServiceContainer.channelTabs.fetchChannelTabNextPage(
+        tabsClient.fetchChannelTabNextPage(
             continuation: token
         ) { [weak self] result in
             DispatchQueue.main.async {
@@ -187,7 +187,7 @@ extension ChannelViewController {
         spinner.startAnimating()
         isLoadingInitial = true
         collectionView?.reloadData()
-        ServiceContainer.channelTabs.fetchChannelPlaylists(
+        tabsClient.fetchChannelPlaylists(
             channelId: channelId,
             params: params
         ) { [weak self] result in
@@ -211,7 +211,7 @@ extension ChannelViewController {
 
     func loadMorePlaylists(continuation: String) {
         let expectedTab = currentTab
-        ServiceContainer.channelTabs.fetchChannelPlaylistsNextPage(
+        tabsClient.fetchChannelPlaylistsNextPage(
             continuation: continuation
         ) { [weak self] result in
             DispatchQueue.main.async {

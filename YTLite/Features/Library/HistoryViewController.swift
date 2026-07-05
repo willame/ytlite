@@ -7,7 +7,7 @@ final class HistoryViewController: UIViewController {
     let channelViewControllerFactory: (
         String,
         String
-    ) -> ChannelViewController
+    ) -> UIViewController
     let videoRouter: VideoRouter
     var videos: [Video] = []
     var continuationToken: String?
@@ -23,7 +23,7 @@ final class HistoryViewController: UIViewController {
         channelViewControllerFactory: @escaping (
             String,
             String
-        ) -> ChannelViewController,
+        ) -> UIViewController,
         videoRouter: VideoRouter = .shared
     ) {
         self.service = service

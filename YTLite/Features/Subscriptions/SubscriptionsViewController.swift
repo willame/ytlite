@@ -9,7 +9,7 @@ class SubscriptionsViewController: UIViewController {
     let channelViewControllerFactory: (
         String,
         String
-    ) -> ChannelViewController
+    ) -> UIViewController
     let videoRouter: VideoRouter
     var videos: [Video] = []
     var continuationToken: String?

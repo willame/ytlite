@@ -40,7 +40,7 @@ class HomeViewController: VideosViewController {
         channelViewControllerFactory: @escaping (
             String,
             String
-        ) -> ChannelViewController,
+        ) -> UIViewController,
         videoRouter: VideoRouter = .shared
     ) {
         self.service = service

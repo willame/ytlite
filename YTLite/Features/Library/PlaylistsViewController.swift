@@ -5,7 +5,7 @@ final class PlaylistsViewController: UIViewController {
     private let channelViewControllerFactory: (
         String,
         String
-    ) -> ChannelViewController
+    ) -> UIViewController
     private let videoRouter: VideoRouter
     private var playlists: [Playlist] = []
     private let tableView = UITableView()
@@ -17,7 +17,7 @@ final class PlaylistsViewController: UIViewController {
         channelViewControllerFactory: @escaping (
             String,
             String
-        ) -> ChannelViewController,
+        ) -> UIViewController,
         videoRouter: VideoRouter = .shared
     ) {
         self.service = service

@@ -39,7 +39,7 @@ final class WatchViewController: UIViewController {
         String,
         String
     )
-        -> ChannelViewController
+        -> UIViewController
     let videoRouter: VideoRouter
     let cache = AppCache.shared
 
@@ -177,7 +177,7 @@ final class WatchViewController: UIViewController {
             String,
             String
         )
-            -> ChannelViewController,
+            -> UIViewController,
         videoRouter: VideoRouter = .shared
     ) {
         let portraitLayout = makePortraitRelatedLayout()

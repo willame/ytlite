@@ -11,7 +11,7 @@ class VideosViewController: UIViewController {
 
     private(set) var videos: [Video] = []
     private(set) var collectionView: UICollectionView?
-    let channelViewControllerFactory: (String, String) -> ChannelViewController
+    let channelViewControllerFactory: (String, String) -> UIViewController
     let videoRouter: VideoRouter
     let spinner = UIActivityIndicatorView(style: .white)
     var isLoadingInitial = true
@@ -26,7 +26,7 @@ class VideosViewController: UIViewController {
         channelViewControllerFactory: @escaping (
             String,
             String
-        ) -> ChannelViewController,
+        ) -> UIViewController,
         videoRouter: VideoRouter = .shared
     ) {
         self.channelViewControllerFactory = channelViewControllerFactory

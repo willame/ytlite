@@ -34,7 +34,7 @@ extension ChannelViewController {
     ) {
         let controller = PlaylistVideosViewController(
             playlist: playlist,
-            service: ServiceContainer.playlists,
+            service: playlistsClient,
             channelViewControllerFactory: channelViewControllerFactory,
             videoRouter: videoRouter
         )

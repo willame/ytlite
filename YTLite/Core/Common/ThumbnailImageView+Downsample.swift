@@ -82,7 +82,7 @@ extension ThumbnailImageView {
         url: URL,
         key: String
     ) {
-        ServiceContainer.mediaTransport.send(
+        transport.send(
             HTTPRequest(method: .get, url: url),
             cancellationToken: nil
         ) { result in

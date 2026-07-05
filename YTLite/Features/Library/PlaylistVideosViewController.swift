@@ -8,7 +8,7 @@ final class PlaylistVideosViewController: UIViewController {
     private let channelViewControllerFactory: (
         String,
         String
-    ) -> ChannelViewController
+    ) -> UIViewController
     private let videoRouter: VideoRouter
     private var videos: [Video] = []
     private var isLoading = true
@@ -22,7 +22,7 @@ final class PlaylistVideosViewController: UIViewController {
         channelViewControllerFactory: @escaping (
             String,
             String
-        ) -> ChannelViewController,
+        ) -> UIViewController,
         videoRouter: VideoRouter = .shared
     ) {
         self.playlist = playlist
