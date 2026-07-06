@@ -334,7 +334,7 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
     }
     private func showSponsorBlockSettings() {
         let vc  = SponsorBlockSettingsViewController()
-        let nav = UINavigationController(rootViewController: vc)
+        let nav = RotatingNavigationController(rootViewController: vc)
         nav.modalPresentationStyle = .formSheet
         present(nav, animated: true)
     }

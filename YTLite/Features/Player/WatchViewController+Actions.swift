@@ -171,44 +171,19 @@ extension WatchViewController {
     }
 
     func makeMinimizeButton() -> UIBarButtonItem {
-        makeChevronButton(
-            systemName: "chevron.down",
-            fallback: .minimize
+        NavChevron.barButton(
+            kind: .minimize,
+            target: self,
+            action: #selector(closeTapped)
         )
     }
 
     func makeBackButton() -> UIBarButtonItem {
-        makeChevronButton(
-            systemName: "chevron.left",
-            fallback: .back
-        )
-    }
-
-    /// One chevron style everywhere: the same glyph the global back
-    /// indicator uses on iOS 13+, and a drawn look-alike on iOS 12.
-    private func makeChevronButton(
-        systemName: String,
-        fallback: PlayerIcons.NavChevron
-    ) -> UIBarButtonItem {
-        let img: UIImage?
-        if #available(iOS 13.0, *) {
-            img = ThemeManager.navChevron(systemName: systemName)
-        } else {
-            img = PlayerIcons.navChevron(fallback)
-        }
-        let item = UIBarButtonItem(
-            image: img,
-            style: .plain,
+        NavChevron.barButton(
+            kind: .back,
             target: self,
             action: #selector(closeTapped)
         )
-        // On iOS 13+ a plain bar item image sits ~8pt further from the edge
-        // than the system back indicator; shift to match. iOS 12 already
-        // places bar items at the edge — shifting would clip them.
-        if #available(iOS 13.0, *) {
-            item.imageInsets = UIEdgeInsets(top: 0, left: -8, bottom: 0, right: 8)
-        }
-        return item
     }
 
     func exitFullscreenIfNeeded() {

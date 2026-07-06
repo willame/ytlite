@@ -175,16 +175,6 @@ extension VideoPlayerView {
 // MARK: - Icon Updates
 
 extension VideoPlayerView {
-    /// Whether PiP is possible at all: device support + the user setting.
-    var isPiPAvailable: Bool {
-        let supported = AVPictureInPictureController
-            .isPictureInPictureSupported()
-        let enabled = UserDefaults.standard.object(
-            forKey: UserDefaultsKeys.Player.pipEnabled
-        ) as? Bool ?? true
-        return supported && enabled
-    }
-
     func updatePlayPauseIcon() {
         let isPlaying = (player?.rate ?? 0) > 0
         let icon = isPlaying
@@ -206,95 +196,5 @@ extension VideoPlayerView {
         playPauseButton.isHidden = hidden
         rewindButton.isHidden = hidden
         forwardButton.isHidden = hidden
-    }
-
-    func setupPiP() {
-        setControlAvailability(
-            pipButton,
-            available: isPiPAvailable
-        )
-        guard isPiPAvailable else {
-            // Also drops a controller created before the user
-            // disabled the setting — it would otherwise keep
-            // serving the (reused) player layer.
-            pipController = nil
-            return
-        }
-        guard pipController == nil else {
-            return
-        }
-        pipController = AVPictureInPictureController(
-            playerLayer: playerLayer
-        )
-        pipController?.delegate = self
-    }
-
-    /// On backgrounding, the system auto-starts PiP when a video layer
-    /// covers the screen — and pauses the player when it has no PiP
-    /// controller. Auto-PiP is wanted only in fullscreen: everywhere else,
-    /// detach the layer while inactive so iOS neither starts PiP nor
-    /// pauses (audio keeps running); the layer comes back on activation.
-    @objc
-    func appWillResignActive() {
-        guard pipController?.isPictureInPictureActive != true else {
-            return
-        }
-        if !isFullscreen || pipController == nil {
-            playerLayer.player = nil
-        }
-    }
-
-    @objc
-    func appDidBecomeActive() {
-        guard let player else {
-            return
-        }
-        if playerLayer.player == nil {
-            playerLayer.player = player
-        }
-        // Re-evaluate the PiP setting (it may have changed in Settings).
-        setupPiP()
-    }
-
-    @objc
-    func pipTapped() {
-        guard let pip = pipController else {
-            return
-        }
-        if pip.isPictureInPictureActive {
-            pip.stopPictureInPicture()
-        } else {
-            pip.startPictureInPicture()
-        }
-    }
-}
-
-// MARK: - PiP Delegate
-
-extension VideoPlayerView: AVPictureInPictureControllerDelegate {
-    func pictureInPictureControllerWillStartPictureInPicture(
-        _ controller: AVPictureInPictureController
-    ) {
-        pipButton.setImage(
-            PlayerIcons.pipExit(),
-            for: .normal
-        )
-    }
-
-    func pictureInPictureControllerDidStopPictureInPicture(
-        _ controller: AVPictureInPictureController
-    ) {
-        pipButton.setImage(
-            PlayerIcons.pip(),
-            for: .normal
-        )
-    }
-
-    func pictureInPictureController(
-        _ controller: AVPictureInPictureController,
-        restoreUserInterfaceForPictureInPictureStopWithCompletionHandler
-            completionHandler: @escaping (Bool) -> Void
-    ) {
-        completionHandler(true)
     }
 }

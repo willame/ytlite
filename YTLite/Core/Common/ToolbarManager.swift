@@ -74,7 +74,7 @@ extension UIViewController {
 
     @objc
     func toolbarOpenSettings() {
-        let nav = UINavigationController(rootViewController: SettingsViewController())
+        let nav = RotatingNavigationController(rootViewController: SettingsViewController())
         nav.modalPresentationStyle = .pageSheet
         if #available(iOS 15, *) {
             if let sheet = nav.sheetPresentationController {

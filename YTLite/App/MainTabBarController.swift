@@ -1,43 +1,5 @@
 import UIKit
 
-/// Navigation controller that forwards rotation queries to the top view controller.
-final class RotatingNavigationController: UINavigationController {
-    override var shouldAutorotate: Bool {
-        topViewController?.shouldAutorotate ?? super.shouldAutorotate
-    }
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        topViewController?.supportedInterfaceOrientations
-            ?? super.supportedInterfaceOrientations
-    }
-    override var prefersStatusBarHidden: Bool {
-        topViewController?.prefersStatusBarHidden ?? super.prefersStatusBarHidden
-    }
-    override var childForStatusBarHidden: UIViewController? {
-        topViewController
-    }
-    override var prefersHomeIndicatorAutoHidden: Bool {
-        topViewController?.prefersHomeIndicatorAutoHidden ?? super.prefersHomeIndicatorAutoHidden
-    }
-    override var childForHomeIndicatorAutoHidden: UIViewController? {
-        topViewController
-    }
-
-    override func pushViewController(
-        _ viewController: UIViewController,
-        animated: Bool
-    ) {
-        let backItem = UIBarButtonItem(
-            title: "",
-            style: .plain,
-            target: nil,
-            action: nil
-        )
-        topViewController?.navigationItem.backBarButtonItem = backItem
-        viewController.navigationItem.backBarButtonItem = backItem
-        super.pushViewController(viewController, animated: animated)
-    }
-}
-
 class MainTabBarController: UITabBarController {
     private let dependencies: AppDependencies
     private weak var playerPanel: PlayerPanelViewController?

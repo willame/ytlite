@@ -72,23 +72,6 @@ extension SubscriptionsViewController {
 // MARK: - Private Helpers
 
 private extension SubscriptionsViewController {
-    static func backChevronImage() -> UIImage? {
-        let size = CGSize(width: 13, height: 21)
-        UIGraphicsBeginImageContextWithOptions(size, false, 0)
-        let path = UIBezierPath()
-        path.move(to: CGPoint(x: 11, y: 1.5))
-        path.addLine(to: CGPoint(x: 2, y: 10.5))
-        path.addLine(to: CGPoint(x: 11, y: 19.5))
-        path.lineWidth = 3
-        path.lineCapStyle = .round
-        path.lineJoinStyle = .round
-        UIColor.white.setStroke()
-        path.stroke()
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return image?.withRenderingMode(.alwaysTemplate)
-    }
-
     func enterChannelFilter(_ channel: SubscribedChannel) {
         if selectedChannel == nil {
             stashedVideos = videos
@@ -111,9 +94,8 @@ private extension SubscriptionsViewController {
         guard navigationItem.leftBarButtonItem == nil else {
             return
         }
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: SubscriptionsViewController.backChevronImage(),
-            style: .plain,
+        navigationItem.leftBarButtonItem = NavChevron.barButton(
+            kind: .back,
             target: self,
             action: #selector(exitChannelFilterTapped)
         )

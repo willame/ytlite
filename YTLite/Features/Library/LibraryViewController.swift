@@ -28,15 +28,15 @@ final class LibraryViewController: UIViewController {
 
     private lazy var childNavVCs: [UINavigationController] = {
         let navs = [
-            UINavigationController(
+            RotatingNavigationController(
                 rootViewController: HistoryViewController(
                     service: dependencies.historyService,
                     channelViewControllerFactory:
                         dependencies.makeChannelViewController
                 )
             ),
-            UINavigationController(rootViewController: DownloadsViewController()),
-            UINavigationController(
+            RotatingNavigationController(rootViewController: DownloadsViewController()),
+            RotatingNavigationController(
                 rootViewController: PlaylistsViewController(
                     service: dependencies.playlistService,
                     channelViewControllerFactory:

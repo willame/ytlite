@@ -1,18 +1,39 @@
 import UIKit
 
-// MARK: - Navigation chevrons (pre-iOS 13 fallback)
-
-// No SF Symbols before iOS 13 — draw the chevrons to match the system back
-// indicator (~12×21pt, 3pt rounded stroke) so the watch screen's custom
-// buttons look like the back button on every other screen.
-
-extension PlayerIcons {
-    enum NavChevron {
+/// The single factory for navigation chevrons. Every screen builds its
+/// back/minimize button here — and `RotatingNavigationController` replaces
+/// the system back button on push — so the glyph and edge inset are
+/// identical on every screen and iOS version.
+enum NavChevron {
+    enum Kind {
         case back
         case minimize
     }
 
-    static func navChevron(_ kind: NavChevron) -> UIImage {
+    static func barButton(
+        kind: Kind,
+        target: Any?,
+        action: Selector
+    ) -> UIBarButtonItem {
+        UIBarButtonItem(
+            image: image(kind: kind),
+            style: .plain,
+            target: target,
+            action: action
+        )
+    }
+
+    static func image(kind: Kind) -> UIImage? {
+        if #available(iOS 13.0, *) {
+            let name = kind == .back ? "chevron.left" : "chevron.down"
+            return ThemeManager.navChevron(systemName: name)
+        }
+        return drawnChevron(kind: kind)
+    }
+
+    // MARK: - Pre-iOS 13 fallback (no SF Symbols)
+
+    private static func drawnChevron(kind: Kind) -> UIImage {
         let size: CGSize
         let points: [CGPoint]
         switch kind {
@@ -31,10 +52,6 @@ extension PlayerIcons {
                 CGPoint(x: 20, y: 2)
             ]
         }
-        return strokedPath(points: points, size: size)
-    }
-
-    private static func strokedPath(points: [CGPoint], size: CGSize) -> UIImage {
         let image = UIGraphicsImageRenderer(size: size).image { _ in
             let path = UIBezierPath()
             path.move(to: points[0])

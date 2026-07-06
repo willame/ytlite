@@ -45,7 +45,7 @@ extension ChannelViewController {
             return
         }
         let vc = ChannelAboutViewController(page: page)
-        let nav = UINavigationController(rootViewController: vc)
+        let nav = RotatingNavigationController(rootViewController: vc)
         nav.modalPresentationStyle = .pageSheet
         present(nav, animated: true)
     }
