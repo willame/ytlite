@@ -3,6 +3,27 @@ import UIKit
 // MARK: - Category chips & shelf drain
 
 extension HomeViewController {
+    func observeSignOut() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSignOut),
+            name: .userDidSignOut,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLayoutSettingChange),
+            name: .homeLayoutSettingDidChange,
+            object: nil
+        )
+    }
+
+    /// Rebuilds the feed in the new layout from session caches.
+    @objc
+    private func handleLayoutSettingChange() {
+        selectCategory(at: selectedCategoryIndex)
+    }
+
     func setupEmptyViews() {
         view.addSubview(errorLabel)
         view.addSubview(signInEmptyView)

@@ -40,6 +40,7 @@ enum UserDefaultsKeys {
 
     enum Feed {
         static let showShorts = "feed_showShorts"
+        static let homeLayout = "feed_homeLayout"
     }
 
     enum Search {

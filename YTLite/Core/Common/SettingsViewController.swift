@@ -6,6 +6,7 @@ final class SettingsViewController: UIViewController {
     private enum Row {
         case theme, autoDarkStart, autoDarkEnd
         case quality, backgroundPlayback, pipEnabled, hideStatusBar, showShorts
+        case homeLayout
         case persistCache, feedCacheDays
         case imageCacheEnabled, imageCacheDays
         case clearCache, rydEnabled
@@ -58,6 +59,13 @@ final class SettingsViewController: UIViewController {
                     .quality, .backgroundPlayback, .pipEnabled,
                     .hideStatusBar, .showShorts
                 ]
+            ),
+            Section(
+                header: "Home",
+                footer: "How recommendation shelves are shown:"
+                    + " one continuous grid, a grid grouped under"
+                    + " shelf titles, or TV-style horizontal rails.",
+                rows: [.homeLayout]
             ),
             Section(header: "Cache", footer: nil, rows: cacheRows),
             Section(header: "Return YouTube Dislike", footer: rydFooter, rows: [.rydEnabled]),
@@ -223,6 +231,11 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
             }
         case .showShorts:
             return makeShowShortsCell()
+        case .homeLayout:
+            return makeDisclosureCell(
+                "Home Layout",
+                value: HomeLayout.selected.displayName
+            )
         case .persistCache:
             return makeToggleCell("Feed Cache", isOn: AppCache.persistenceEnabled) {
                 AppCache.persistenceEnabled = $0
@@ -415,6 +428,8 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
             showAutoHourPicker(isStart: true)
         case .autoDarkEnd:
             showAutoHourPicker(isStart: false)
+        case .homeLayout:
+            showHomeLayoutPicker()
         default:
             return false
         }
@@ -465,6 +480,30 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
                 self.tableView.reloadData()
             }
             if opt == VideoQualityStore.selected {
+                action.setValue(true, forKey: "checked")
+            }
+            sheet.addAction(action)
+        }
+        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        configureCenteredPopover(sheet)
+        present(sheet, animated: true)
+    }
+
+    private func showHomeLayoutPicker() {
+        let sheet = UIAlertController(
+            title: "Home Layout",
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        for layout in HomeLayout.allCases {
+            let action = UIAlertAction(
+                title: layout.displayName,
+                style: .default
+            ) { _ in
+                HomeLayout.selected = layout
+                self.tableView.reloadData()
+            }
+            if layout == HomeLayout.selected {
                 action.setValue(true, forKey: "checked")
             }
             sheet.addAction(action)

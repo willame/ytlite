@@ -5,6 +5,8 @@ import Foundation
 struct FeedShelf: Codable {
     let title: String?
     let count: Int
+    /// The shelf's own "more of this row" token (rails page with it).
+    var continuation: String?
 }
 
 /// A shelf's "more of this row" token, kept with the shelf title so

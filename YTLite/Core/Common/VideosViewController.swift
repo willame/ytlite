@@ -4,6 +4,8 @@ import UIKit
 struct VideoSection {
     let title: String?
     var videos: [Video]
+    /// The shelf's own token — rails page horizontally with it.
+    var continuation: String?
 }
 
 class VideosViewController: UIViewController {
@@ -15,6 +17,12 @@ class VideosViewController: UIViewController {
 
     var columns: Int { 5 }
 
+    /// How shelves are rendered. Pages without shelf info (channel
+    /// tabs, search) look the same in every mode.
+    var shelfLayout: HomeLayout { .shelves }
+
+    var useRails: Bool { shelfLayout == .rails }
+
     private(set) var sections: [VideoSection] = []
     private(set) var collectionView: UICollectionView?
     let channelViewControllerFactory: (String, String) -> UIViewController
@@ -25,6 +33,8 @@ class VideosViewController: UIViewController {
 
     private var continuationToken: String?
     private var seenVideoIds: Set<String> = []
+    /// Sections with an in-flight horizontal (rail) page fetch.
+    var loadingRailSections: Set<Int> = []
 
     var currentContinuation: String? { continuationToken }
     var videoCount: Int { sections.reduce(0) { $0 + $1.videos.count } }
@@ -120,6 +130,10 @@ class VideosViewController: UIViewController {
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: VideoSectionHeaderView.reuseId
         )
+        cv.register(
+            ShelfRailCell.self,
+            forCellWithReuseIdentifier: ShelfRailCell.reuseId
+        )
     }
 
     private func setupSpinner() {
@@ -144,6 +158,15 @@ class VideosViewController: UIViewController {
     // Override in subclasses to load next page
     func handleLoadMore() {}
 
+    /// Override in subclasses to fetch a rail's horizontal page.
+    /// Must call `completion` (on the main thread) exactly once.
+    func loadRailPage(
+        token: String,
+        completion: @escaping (FeedPage?) -> Void
+    ) {
+        completion(nil)
+    }
+
     // Kept in the class body (not the extension) so subclasses can
     // override it.
     func openVideo(_ video: Video) {
@@ -151,32 +174,6 @@ class VideosViewController: UIViewController {
             video: video,
             from: self
         )
-    }
-
-    func updateItemSize() {
-        guard let collectionView,
-              let layout = collectionView
-                  .collectionViewLayout
-                  as? UICollectionViewFlowLayout
-        else {
-            return
-        }
-        let inset = layout.sectionInset.left
-            + layout.sectionInset.right
-        let spacing = layout.minimumInteritemSpacing
-            * CGFloat(max(columns - 1, 0))
-        let available = collectionView.bounds.width
-            - inset - spacing
-        let width = floor(available / CGFloat(columns))
-        let height: CGFloat = width * (9.0 / 16.0) + 92
-        let newSize = CGSize(
-            width: width,
-            height: height
-        )
-        if layout.itemSize != newSize {
-            layout.itemSize = newSize
-            layout.invalidateLayout()
-        }
     }
 
     @objc
@@ -190,42 +187,11 @@ class VideosViewController: UIViewController {
 // MARK: - Page Management
 
 extension VideosViewController {
-    func video(at indexPath: IndexPath) -> Video {
-        sections[indexPath.section].videos[indexPath.item]
-    }
-
-    /// Number of videos after the given index path (for the
-    /// load-more trigger).
-    func videosRemaining(after indexPath: IndexPath) -> Int {
-        var remaining = sections[indexPath.section].videos.count
-            - indexPath.item - 1
-        for section in sections.dropFirst(indexPath.section + 1) {
-            remaining += section.videos.count
-        }
-        return remaining
-    }
-
-    func openChannel(for video: Video) {
-        guard let channelId = video.channelId else {
-            return
-        }
-        navigationController?.pushViewController(
-            channelViewControllerFactory(
-                channelId,
-                video.channelName
-            ),
-            animated: true
-        )
-    }
-
-    func endRefreshing() {
-        collectionView?.refreshControl?.endRefreshing()
-    }
-
     /// Splits the page's videos into sections following its shelf
     /// partition, deduplicating against already-shown videos.
     private func makeSections(from page: FeedPage) -> [VideoSection] {
-        let shelves = page.shelves
+        let grouped = shelfLayout == .grid ? nil : page.shelves
+        let shelves = grouped
             ?? [FeedShelf(title: nil, count: page.videos.count)]
         var result: [VideoSection] = []
         var index = 0
@@ -236,9 +202,11 @@ extension VideosViewController {
             }
             index = end
             if !slice.isEmpty {
-                result.append(
-                    VideoSection(title: shelf.title, videos: slice)
-                )
+                result.append(VideoSection(
+                    title: shelf.title,
+                    videos: slice,
+                    continuation: shelf.continuation
+                ))
             }
         }
         let rest = page.videos.dropFirst(index).filter {
@@ -253,26 +221,73 @@ extension VideosViewController {
     func setPage(_ page: FeedPage) {
         isLoadingInitial = false
         seenVideoIds = []
+        loadingRailSections = []
         sections = makeSections(from: page)
         continuationToken = page.continuation
         isLoadingMore = false
         collectionView?.reloadData()
     }
 
+    /// Appends a rail's horizontal page to its section; returns the
+    /// deduplicated videos that were actually added.
+    func appendToRail(
+        _ videos: [Video],
+        section: Int,
+        continuation: String?
+    ) -> [Video] {
+        sections[section].continuation = continuation
+        let fresh = videos.filter {
+            seenVideoIds.insert($0.id).inserted
+        }
+        sections[section].videos.append(contentsOf: fresh)
+        return fresh
+    }
+
     func appendPage(_ page: FeedPage) {
-        let newSections = makeSections(from: page)
-        let insertStart = sections.count
-        sections.append(contentsOf: newSections)
+        var newSections = makeSections(from: page)
         continuationToken = page.continuation
         isLoadingMore = false
 
         if isLoadingInitial {
             isLoadingInitial = false
+            sections.append(contentsOf: newSections)
             collectionView?.reloadData()
-        } else if !newSections.isEmpty {
-            collectionView?.insertSections(
-                IndexSet(insertStart..<sections.count)
-            )
+            return
+        }
+        let itemPaths = mergeIntoLastSection(&newSections)
+        let insertStart = sections.count
+        sections.append(contentsOf: newSections)
+        collectionView?.performBatchUpdates {
+            if !itemPaths.isEmpty {
+                collectionView?.insertItems(at: itemPaths)
+            }
+            if insertStart < sections.count {
+                collectionView?.insertSections(
+                    IndexSet(insertStart..<sections.count)
+                )
+            }
+        }
+    }
+
+    /// A flow-layout section always starts a new row, so a page
+    /// boundary inside the same (or untitled) shelf would leave a
+    /// gap — extend the previous section instead. Rails render one
+    /// item per section, so item inserts don't apply there.
+    private func mergeIntoLastSection(
+        _ newSections: inout [VideoSection]
+    ) -> [IndexPath] {
+        guard !useRails,
+              let first = newSections.first,
+              let last = sections.indices.last,
+              sections[last].title == first.title
+        else {
+            return []
+        }
+        let start = sections[last].videos.count
+        sections[last].videos.append(contentsOf: first.videos)
+        newSections.removeFirst()
+        return (start..<start + first.videos.count).map {
+            IndexPath(item: $0, section: last)
         }
     }
 

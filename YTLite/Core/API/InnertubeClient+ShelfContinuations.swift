@@ -44,19 +44,31 @@ extension InnertubeClient {
         let before = acc.videos.count
         appendShelfVideos(from: sc, into: &acc.videos)
         let added = acc.videos.count - before
-        // Only video shelves are kept — channel/mix shelves would
-        // page through zero-video responses forever if drained.
         if added > 0 {
-            acc.shelves.append(FeedShelf(title: title, count: added))
-            if let token = shelfContinuationToken(in: sc) {
-                acc.continuations.append(
-                    ShelfContinuation(title: title, token: token)
-                )
-            }
+            recordShelf(title, added: added, content: sc, into: &acc)
         }
         AppLog.innertube(
             "shelf '\(title ?? "?")': +\(added) videos"
         )
+    }
+
+    /// Only video shelves are recorded — channel/mix shelves would
+    /// page through zero-video responses forever if drained.
+    private static func recordShelf(
+        _ title: String?,
+        added: Int,
+        content: [String: Any],
+        into acc: inout ShelfAccumulator
+    ) {
+        let token = shelfContinuationToken(in: content)
+        acc.shelves.append(
+            FeedShelf(title: title, count: added, continuation: token)
+        )
+        if let token {
+            acc.continuations.append(
+                ShelfContinuation(title: title, token: token)
+            )
+        }
     }
 
     static func parseHorizontalListCont(

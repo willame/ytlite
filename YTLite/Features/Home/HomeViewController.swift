@@ -25,6 +25,8 @@ class HomeViewController: VideosViewController {
     private var lastScrollY: CGFloat = 0
     lazy var chipBar = ChipBarView()
 
+    override var shelfLayout: HomeLayout { HomeLayout.selected }
+
     override var columns: Int {
         if UIDevice.current.userInterfaceIdiom == .phone {
             return 1
@@ -84,15 +86,6 @@ class HomeViewController: VideosViewController {
         loadCachedOrFetchFeed()
     }
 
-    private func observeSignOut() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleSignOut),
-            name: .userDidSignOut,
-            object: nil
-        )
-    }
-
     func loadCachedOrFetchFeed() {
         cache.loadHomeFeed { [weak self] cachedPage in
             guard let self else {
@@ -116,7 +109,7 @@ class HomeViewController: VideosViewController {
     }
 
     @objc
-    private func handleSignOut() {
+    func handleSignOut() {
         ScreenVisitTracker.reset()
         cache.clearHomeFeed()
         categoryCache = [:]
@@ -185,6 +178,22 @@ class HomeViewController: VideosViewController {
                     self.setPage(FeedPage(videos: [], continuation: nil))
                     self.showFeedError()
                 }
+            }
+        }
+    }
+
+    override func loadRailPage(
+        token: String,
+        completion: @escaping (FeedPage?) -> Void
+    ) {
+        let generation = feedGeneration
+        service.fetchNextPage(continuation: token) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self, self.feedGeneration == generation else {
+                    completion(nil)
+                    return
+                }
+                completion(try? result.get())
             }
         }
     }
