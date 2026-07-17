@@ -17,7 +17,12 @@ final class VideoPlayerView: UIView {
     weak var delegate: VideoPlayerViewDelegate?
 
     var isFullscreen: Bool = false {
-        didSet { updateFullscreenIcon() }
+        didSet {
+            updateFullscreenIcon()
+            if !isFullscreen {
+                setZoom(1, animated: false)
+            }
+        }
     }
 
     var onTimeUpdate: ((Double) -> Void)?
@@ -173,6 +178,30 @@ final class VideoPlayerView: UIView {
         return label
     }()
 
+    // MARK: - Zoom
+
+    /// Video scale relative to aspect-fit; 1 = fit, `fillZoom` = no bars.
+    var videoZoom: CGFloat = 1
+    var pinchStartZoom: CGFloat = 1
+    var zoomHUDWorkItem: DispatchWorkItem?
+
+    let zoomLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.font = UIFont.monospacedDigitSystemFont(
+            ofSize: 14,
+            weight: .semibold
+        )
+        label.textAlignment = .center
+        label.backgroundColor = UIColor.black
+            .withAlphaComponent(0.75)
+        label.layer.cornerRadius = 4
+        label.layer.masksToBounds = true
+        label.alpha = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
     // MARK: - State
 
     var timeObserver: Any?
@@ -207,7 +236,13 @@ final class VideoPlayerView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        playerLayer.frame = bounds
+        // bounds+position instead of frame: frame is undefined while the
+        // layer carries the pinch-zoom scale transform.
+        playerLayer.bounds = bounds
+        playerLayer.position = CGPoint(
+            x: bounds.midX,
+            y: bounds.midY
+        )
         topGradientLayer.frame = CGRect(
             x: 0,
             y: 0,

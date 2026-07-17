@@ -35,12 +35,14 @@ extension VideoPlayerView {
     func handlePinch(
         _ gesture: UIPinchGestureRecognizer
     ) {
+        if isFullscreen {
+            handleFullscreenPinch(gesture)
+            return
+        }
         guard gesture.state == .ended else {
             return
         }
-        if gesture.scale > 1.2, !isFullscreen {
-            delegate?.videoPlayerViewDidTapFullscreen(self)
-        } else if gesture.scale < 0.8, isFullscreen {
+        if gesture.scale > 1.2 {
             delegate?.videoPlayerViewDidTapFullscreen(self)
         }
     }
