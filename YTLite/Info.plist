@@ -37,6 +37,7 @@
 		<string>ja</string>
 		<string>kk</string>
 		<string>km</string>
+		<string>ko</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
