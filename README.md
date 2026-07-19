@@ -49,7 +49,9 @@ When Google dropped support for the official YouTube app on older devices, there
 - **Picture-in-Picture** — watch while using other apps
 - **SponsorBlock** — skip sponsored segments automatically
 - **Return YouTube Dislike** — see dislike counts again
+- **Audio tracks** — switch dubbed audio on multi-language videos; AI auto-dubs are marked "(AI)"
 - **Subtitles** — full subtitle/caption support with VTT parsing
+- **67 languages** — localized interface, with video titles/search/feeds following your language (see [Localization](#localization))
 - **Search & browse** — live suggestions, recent-search history, filters (sort, upload date, type, duration), channel pages, playlists
 - **Smart home feed** — endless recommendations with category chips read from your feed's shelves
 - **Subscriptions** — follow channels with a local subscription feed
@@ -139,11 +141,43 @@ Install the `.ipa` package directly:
 
 ## Known Issues and Limitations
 
-- Audio track selection is not possible yet (dubbed videos play their original audio)
 - Playback speeds above 2x may cause issues
 - **Shorts** are not natively supported — they are treated as regular videos, but can be hidden from the subscriptions feed
 - Comments are displayed as a flat read-only list
 - Offline download is not yet available
+
+## Localization
+
+The interface follows your system language by default and can be overridden in **Settings → Language**. The content language (video titles, search, feeds — translated server-side by YouTube, like the official app) follows the app language; the region can be set separately.
+
+> [!NOTE]
+> All translations except English, Russian and Ukrainian were produced with LLM assistance and then review-passed — mistakes are still possible. If you spot a wrong or awkward translation, please [open an issue](../../issues) describing where it appears and what the correct wording should be. To improve a whole language (or add a new one), see [TRANSLATING.md](TRANSLATING.md).
+
+<details>
+<summary><b>Available in 67 languages</b></summary>
+<br>
+
+| | | | |
+|---|---|---|---|
+| `en` English | `ru` Русский | `af` Afrikaans | `am` አማርኛ |
+| `az` Azərbaycanca | `be` Беларуская | `bg` Български | `bn` বাংলা |
+| `bs` Bosanski | `ca` Català | `cs` Čeština | `da` Dansk |
+| `de` Deutsch | `el` Ελληνικά | `es` Español | `et` Eesti |
+| `eu` Euskara | `fi` Suomi | `fr` Français | `ga` Gaeilge |
+| `gl` Galego | `gu` ગુજરાતી | `hi` हिन्दी | `hr` Hrvatski |
+| `hu` Magyar | `id` Bahasa Indonesia | `is` Íslenska | `it` Italiano |
+| `ja` 日本語 | `kk` Қазақша | `km` ភាសាខ្មែរ | `ko` 한국어 |
+| `ky` Кыргызча | `lo` ລາວ | `lt` Lietuvių | `lv` Latviešu |
+| `mk` Македонски | `ml` മലയാളം | `mn` Монгол | `mr` मराठी |
+| `ms` Bahasa Melayu | `my` မြန်မာ | `ne` नेपाली | `nl` Nederlands |
+| `no` Norsk | `pa` ਪੰਜਾਬੀ | `pl` Polski | `pt` Português |
+| `ro` Română | `si` සිංහල | `sk` Slovenčina | `sl` Slovenščina |
+| `sq` Shqip | `sr` Српски | `sv` Svenska | `sw` Kiswahili |
+| `ta` தமிழ் | `te` తెలుగు | `th` ไทย | `tl` Filipino |
+| `tr` Türkçe | `uk` Українська | `uz` Oʻzbekcha | `vi` Tiếng Việt |
+| `zh-Hans` 简体中文 | `zh-Hant` 繁體中文 | `zu` isiZulu | |
+
+</details>
 
 ## Playback Helper Server
 
