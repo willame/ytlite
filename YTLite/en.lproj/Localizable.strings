@@ -237,3 +237,113 @@
 "profile.signOut" = "Sign Out";
 "profile.clearImageCache" = "Clear Image Cache";
 "profile.imageCacheCleared" = "Image cache cleared.";
+
+/* ===== Search ===== */
+
+"search.title" = "Search";
+/* Search bar placeholder */
+"search.placeholder" = "Search YouTube";
+/* Header above the recent-search list */
+"search.recent" = "Recent searches";
+/* Filters toolbar button; the dotted variant marks active filters */
+"search.filters" = "Filters";
+"search.filters.active" = "Filters •";
+/* Filters sheet title + reset action */
+"search.filters.title" = "Search Filters";
+"search.filters.reset" = "Reset filters";
+/* Filter rows; %1$@ = the current value */
+"search.filters.sort" = "Sort: %1$@";
+"search.filters.date" = "Date: %1$@";
+"search.filters.type" = "Type: %1$@";
+"search.filters.duration" = "Duration: %1$@";
+/* Sub-sheet titles */
+"search.filters.sortTitle" = "Sort by";
+"search.filters.dateTitle" = "Upload date";
+"search.filters.typeTitle" = "Type";
+"search.filters.durationTitle" = "Duration";
+
+/* Filter option values */
+"search.sort.relevance" = "Relevance";
+"search.sort.rating" = "Rating";
+"search.sort.uploadDate" = "Upload date";
+"search.sort.viewCount" = "View count";
+"search.date.any" = "Any time";
+"search.date.lastHour" = "Last hour";
+"search.date.today" = "Today";
+"search.date.thisWeek" = "This week";
+"search.date.thisMonth" = "This month";
+"search.date.thisYear" = "This year";
+"search.type.any" = "Any type";
+"search.type.video" = "Video";
+"search.type.channel" = "Channel";
+"search.type.playlist" = "Playlist";
+"search.duration.any" = "Any duration";
+"search.duration.short" = "Under 4 min";
+"search.duration.medium" = "4–20 min";
+"search.duration.long" = "Over 20 min";
+
+/* ===== Home ===== */
+
+"home.title" = "Home";
+/* Chip resetting to the unfiltered feed */
+"home.category.all" = "All";
+/* Static category chips (server shelf titles arrive already localized) */
+"home.category.live" = "Live";
+"home.category.news" = "News";
+"home.category.gaming" = "Gaming";
+"home.category.sports" = "Sports";
+"home.category.learning" = "Learning";
+"home.category.fashion" = "Fashion";
+/* Error empty state (two lines) */
+"home.error.loadFailed" = "Couldn't load feed\nPull down to retry";
+/* Signed-out empty state */
+"home.signIn" = "Sign in to see your recommendations";
+
+/* ===== Channel ===== */
+
+/* Channel tab bar */
+"channel.tab.videos" = "Videos";
+"channel.tab.live" = "Live";
+"channel.tab.playlists" = "Playlists";
+/* About sheet */
+"channel.about.title" = "About";
+"channel.about.close" = "Close";
+"channel.about.subscribers" = "Subscribers";
+"channel.about.videos" = "Videos";
+"channel.about.description" = "Description";
+"channel.about.contact" = "Contact";
+
+/* ===== Library ===== */
+
+"library.history" = "History";
+"library.downloads" = "Downloads";
+"library.playlists" = "Playlists";
+"library.downloads.comingSoon" = "Downloads coming soon";
+"library.history.signIn" = "Sign in to view your watch history";
+"library.history.empty" = "No watch history found";
+"library.history.loadFailed" = "Could not load history";
+"library.playlists.signIn" = "Sign in to view your playlists";
+"library.playlists.loadFailed" = "Could not load playlists";
+"library.playlist.empty" = "No videos in this playlist";
+"library.playlist.loadFailed" = "Could not load playlist";
+
+/* ===== Subscriptions ===== */
+
+"subscriptions.title" = "Subscriptions";
+"subscriptions.all" = "All subscriptions";
+/* "All" button in the channel avatar bar */
+"subscriptions.allButton" = "All";
+"subscriptions.signIn" = "Sign in to see your subscriptions";
+
+/* ===== Account (toolbar sheet) ===== */
+
+/* Fallback account name when the profile has none */
+"account.fallbackName" = "Account";
+"account.signIn" = "Sign In";
+"account.signOut" = "Sign Out";
+"account.notSignedIn" = "Not signed in";
+
+/* Generic error alert title */
+"common.error" = "Error";
+/* Channel screen failed to load */
+"channel.unavailable" = "Channel unavailable";
