@@ -42,6 +42,7 @@
 		<string>lo</string>
 		<string>lt</string>
 		<string>lv</string>
+		<string>mk</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
