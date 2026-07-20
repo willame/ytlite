@@ -132,6 +132,42 @@
       "date": "2026-07-14T11:00:00Z",
       "tintColor": "FF0000",
       "url": "https://github.com/verback2308/YTLite"
+    },
+    {
+      "title": "YTLite 1.3.0 — Channel filter, faster playback start, unified navigation, and fixes for iOS 26+ and fullscreen",
+      "identifier": "release-1.3.0",
+      "caption": "Add channel filter to Subscriptions screen",
+      "date": "2026-07-09T23:03:05Z",
+      "tintColor": "FF0000",
+      "appID": "com.verback.YTLite",
+      "url": "https://github.com/verback2308/ytlite/releases/tag/1.3.0"
+    },
+    {
+      "title": "YTLite 1.2.0 - Instant video playback, YouTube Mix support, cross-device sync, performance improvements, and bug fixes across playback, subscriptions, and channel pages",
+      "identifier": "release-1.2.0",
+      "caption": "Videos now start instantly — PO token generation moved from startup to on-demand",
+      "date": "2026-06-29T01:54:33Z",
+      "tintColor": "FF0000",
+      "appID": "com.verback.YTLite",
+      "url": "https://github.com/verback2308/ytlite/releases/tag/1.2.0"
+    },
+    {
+      "title": "YTLite 1.1.0_105",
+      "identifier": "release-1.1.0_105",
+      "caption": "Added an ability to change playback speed",
+      "date": "2026-06-13T22:03:16Z",
+      "tintColor": "FF0000",
+      "appID": "com.verback.YTLite",
+      "url": "https://github.com/verback2308/ytlite/releases/tag/1.1.0_105"
+    },
+    {
+      "title": "YTLite 1.1.0_103",
+      "identifier": "release-1.1.0_103",
+      "caption": "The first public version of YTLite.",
+      "date": "2026-06-10T18:20:21Z",
+      "tintColor": "FF0000",
+      "appID": "com.verback.YTLite",
+      "url": "https://github.com/verback2308/ytlite/releases/tag/1.1.0_103"
     }
   ]
 }
