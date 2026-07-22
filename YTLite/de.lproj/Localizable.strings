@@ -369,3 +369,9 @@
 /* Added during review merge */
 "sponsorblock.category.selfpromo.description" = "Wie „Sponsor“, aber für unbezahlte Werbung oder Eigenwerbung: Merchandise, Spenden oder Informationen über Kooperationen.";
 "sponsorblock.category.highlight.description" = "Der Teil des Videos, den die meisten suchen. Vergleichbar mit „Video beginnt bei x“-Kommentaren.";
+
+/* ===== Player: play queue (English fallback) ===== */
+"player.queue.playNext" = "Play next";
+"player.queue.addToQueue" = "Add to queue";
+"player.queue.added.playNext" = "Playing next";
+"player.queue.added.queue" = "Added to queue";

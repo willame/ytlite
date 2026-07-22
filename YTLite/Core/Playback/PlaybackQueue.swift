@@ -40,6 +40,35 @@ final class PlaybackQueue {
         }
     }
 
+    /// Insert `video` right after the current one so it plays next. Seeds
+    /// the queue with `currentVideo` when empty so the existing "play queue
+    /// next" plumbing (playToEnd / remote next) picks it up. Never sets a
+    /// title, so a user-built queue stays out of playlist mode.
+    func playNext(_ video: Video, currentVideo: Video?) {
+        videos.removeAll { $0.id == video.id }
+        if videos.isEmpty {
+            if let current = currentVideo, current.id != video.id {
+                videos = [current, video]
+            } else {
+                videos = [video]
+            }
+            return
+        }
+        videos.insert(video, at: 1)
+    }
+
+    /// Append `video` to the end of the queue. Seeds with `currentVideo`
+    /// when empty, same as `playNext`.
+    func addToQueue(_ video: Video, currentVideo: Video?) {
+        videos.removeAll { $0.id == video.id }
+        if videos.isEmpty,
+           let current = currentVideo,
+           current.id != video.id {
+            videos = [current]
+        }
+        videos.append(video)
+    }
+
     func clear() {
         videos = []
         playlistTitle = nil

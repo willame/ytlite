@@ -371,3 +371,13 @@
 /* Alert after changing a language setting */
 "settings.language.restartTitle" = "需要重新启动";
 "settings.language.restartMessage" = "更改在重新启动应用后完全生效。";
+
+/* ===== Player: play queue ===== */
+/* Menu item: play this video right after the current one */
+"player.queue.playNext" = "接下来播放";
+/* Menu item: add this video to the end of the play queue */
+"player.queue.addToQueue" = "加入队列";
+/* Toast confirming the video will play next */
+"player.queue.added.playNext" = "已设为接下来播放";
+/* Toast confirming the video was added to the queue */
+"player.queue.added.queue" = "已加入队列";

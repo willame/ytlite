@@ -69,6 +69,9 @@ extension WatchViewController: UICollectionViewDataSource {
         cell.forceGridLayout = !isLandscape
         cell.configure(with: video)
         configureChannelNavigation(for: cell, video: video)
+        cell.onLongPress = { [weak self] in
+            self?.presentQueueMenu(for: video)
+        }
         return cell
     }
 

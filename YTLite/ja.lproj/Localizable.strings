@@ -371,3 +371,9 @@
 /* Alert after changing a language setting */
 "settings.language.restartTitle" = "再起動が必要です";
 "settings.language.restartMessage" = "変更はアプリの再起動後に完全に適用されます。";
+
+/* ===== Player: play queue (English fallback) ===== */
+"player.queue.playNext" = "Play next";
+"player.queue.addToQueue" = "Add to queue";
+"player.queue.added.playNext" = "Playing next";
+"player.queue.added.queue" = "Added to queue";

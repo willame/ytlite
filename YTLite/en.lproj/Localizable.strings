@@ -371,3 +371,13 @@
 /* Alert after changing a language setting */
 "settings.language.restartTitle" = "Restart Required";
 "settings.language.restartMessage" = "Changes apply fully after restarting the app.";
+
+/* ===== Player: play queue ===== */
+/* Menu item: play this video right after the current one */
+"player.queue.playNext" = "Play next";
+/* Menu item: add this video to the end of the play queue */
+"player.queue.addToQueue" = "Add to queue";
+/* Toast confirming the video will play next */
+"player.queue.added.playNext" = "Playing next";
+/* Toast confirming the video was added to the queue */
+"player.queue.added.queue" = "Added to queue";

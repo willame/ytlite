@@ -22,6 +22,7 @@ class VideoCell: UICollectionViewCell {
     private var representedChannelId: String?
     private var cachedTitleHeight: CGFloat = 0
     var onChannelTap: (() -> Void)?
+    var onLongPress: (() -> Void)?
 
     /// Force grid layout regardless of cell width.
     var forceGridLayout: Bool = false {
@@ -86,6 +87,7 @@ class VideoCell: UICollectionViewCell {
         progressTrack.isHidden = true
         progressFill.isHidden = true
         onChannelTap = nil
+        onLongPress = nil
     }
 }
 
@@ -124,6 +126,10 @@ extension VideoCell {
         thumbnail.addSubview(liveBadgeView)
 
         setupInfoArea()
+        let longPress = UILongPressGestureRecognizer(
+            target: self, action: #selector(handleLongPress)
+        )
+        contentView.addGestureRecognizer(longPress)
         applyTheme()
     }
 
@@ -269,6 +275,13 @@ extension VideoCell {
     @objc
     private func handleChannelTap() {
         onChannelTap?()
+    }
+
+    @objc
+    private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        if gesture.state == .began {
+            onLongPress?()
+        }
     }
 
     @objc

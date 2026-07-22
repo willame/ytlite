@@ -371,3 +371,9 @@
 /* Alert after changing a language setting */
 "settings.language.restartTitle" = "Yeniden Başlatma Gerekli";
 "settings.language.restartMessage" = "Değişiklikler uygulama yeniden başlatıldıktan sonra tam olarak uygulanır.";
+
+/* ===== Player: play queue (English fallback) ===== */
+"player.queue.playNext" = "Play next";
+"player.queue.addToQueue" = "Add to queue";
+"player.queue.added.playNext" = "Playing next";
+"player.queue.added.queue" = "Added to queue";

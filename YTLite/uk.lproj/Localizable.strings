@@ -286,3 +286,9 @@
 "settings.language.system" = "Системна";
 "settings.language.restartTitle" = "Потрібен перезапуск";
 "settings.language.restartMessage" = "Зміни повністю набудуть чинності після перезапуску застосунку.";
+
+/* ===== Player: play queue (English fallback) ===== */
+"player.queue.playNext" = "Play next";
+"player.queue.addToQueue" = "Add to queue";
+"player.queue.added.playNext" = "Playing next";
+"player.queue.added.queue" = "Added to queue";
