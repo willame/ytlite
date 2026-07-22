@@ -126,11 +126,15 @@ extension VideoCell {
         thumbnail.addSubview(liveBadgeView)
 
         setupInfoArea()
+        setupLongPress()
+        applyTheme()
+    }
+
+    private func setupLongPress() {
         let longPress = UILongPressGestureRecognizer(
             target: self, action: #selector(handleLongPress)
         )
         contentView.addGestureRecognizer(longPress)
-        applyTheme()
     }
 
     private func setupInfoArea() {
