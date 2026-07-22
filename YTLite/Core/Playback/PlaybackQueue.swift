@@ -4,6 +4,9 @@ final class PlaybackQueue {
     static let shared = PlaybackQueue()
     private(set) var videos: [Video] = []
     private(set) var playlistTitle: String?
+    /// True when the queue was built by the user (Play next / Add to queue)
+    /// rather than loaded from a playlist — drives the section header text.
+    private(set) var isUserQueue = false
 
     var hasNext: Bool {
         videos.count > 1
@@ -27,6 +30,7 @@ final class PlaybackQueue {
     ) {
         self.videos = videos
         self.playlistTitle = title
+        isUserQueue = false
     }
 
     func seekTo(videoId: String) {
@@ -45,6 +49,7 @@ final class PlaybackQueue {
     /// next" plumbing (playToEnd / remote next) picks it up. Never sets a
     /// title, so a user-built queue stays out of playlist mode.
     func playNext(_ video: Video, currentVideo: Video?) {
+        isUserQueue = true
         videos.removeAll { $0.id == video.id }
         if videos.isEmpty {
             if let current = currentVideo, current.id != video.id {
@@ -60,6 +65,7 @@ final class PlaybackQueue {
     /// Append `video` to the end of the queue. Seeds with `currentVideo`
     /// when empty, same as `playNext`.
     func addToQueue(_ video: Video, currentVideo: Video?) {
+        isUserQueue = true
         videos.removeAll { $0.id == video.id }
         if videos.isEmpty,
            let current = currentVideo,
@@ -72,5 +78,6 @@ final class PlaybackQueue {
     func clear() {
         videos = []
         playlistTitle = nil
+        isUserQueue = false
     }
 }

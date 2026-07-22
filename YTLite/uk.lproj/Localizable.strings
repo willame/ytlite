@@ -292,3 +292,4 @@
 "player.queue.addToQueue" = "Add to queue";
 "player.queue.added.playNext" = "Playing next";
 "player.queue.added.queue" = "Added to queue";
+"player.queue.sectionTitle" = "Up next";

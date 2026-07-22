@@ -13,6 +13,7 @@ extension WatchViewController {
                 title: "player.queue.playNext".localized
             ) { [weak self] in
                 self?.queue.playNext(video, currentVideo: current)
+                self?.refreshQueueSection()
                 self?.showQueueToast(
                     "player.queue.added.playNext".localized
                 )
@@ -21,12 +22,20 @@ extension WatchViewController {
                 title: "player.queue.addToQueue".localized
             ) { [weak self] in
                 self?.queue.addToQueue(video, currentVideo: current)
+                self?.refreshQueueSection()
                 self?.showQueueToast(
                     "player.queue.added.queue".localized
                 )
             }
         ]
         presentPlayerMenu(title: video.title, items: items)
+    }
+
+    /// Rebuild the related list and recompute its height so the upcoming-queue
+    /// section appears (or updates) right after a queue change.
+    private func refreshQueueSection() {
+        relatedCollectionView.reloadData()
+        updateLayoutForSize()
     }
 
     /// Minimal self-dismissing toast, anchored to the window so it shows

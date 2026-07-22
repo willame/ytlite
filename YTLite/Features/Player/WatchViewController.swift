@@ -156,8 +156,12 @@ final class WatchViewController: UIViewController {
         .allButUpsideDown
     }
 
+    /// Shows the upcoming-queue section (playlist connect-play or a
+    /// user-built Play next / Add to queue list) whenever the queue holds
+    /// something beyond the current video. Collapses automatically once the
+    /// queue drains to the playing video, so no empty header lingers.
     var isPlaylistMode: Bool {
-        queue.playlistTitle != nil
+        queue.videos.count > 1
     }
 
     // MARK: - Initializers

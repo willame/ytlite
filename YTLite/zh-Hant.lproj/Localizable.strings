@@ -381,3 +381,5 @@
 "player.queue.added.playNext" = "已設為接下來播放";
 /* Toast confirming the video was added to the queue */
 "player.queue.added.queue" = "已加入佇列";
+/* Header of the upcoming-queue section under the player */
+"player.queue.sectionTitle" = "接下來播放";
