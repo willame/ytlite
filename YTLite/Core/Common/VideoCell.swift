@@ -134,6 +134,8 @@ extension VideoCell {
         let longPress = UILongPressGestureRecognizer(
             target: self, action: #selector(handleLongPress)
         )
+        longPress.minimumPressDuration = 0.4
+        longPress.delegate = self
         contentView.addGestureRecognizer(longPress)
     }
 
@@ -283,9 +285,11 @@ extension VideoCell {
 
     @objc
     private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        if gesture.state == .began {
-            onLongPress?()
+        guard gesture.state == .began else {
+            return
         }
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        onLongPress?()
     }
 
     @objc
@@ -295,6 +299,17 @@ extension VideoCell {
         titleLabel.textColor = theme.primaryText
         channelLabel.textColor = theme.secondaryText
         metaLabel.textColor = theme.secondaryText
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+
+extension VideoCell: UIGestureRecognizerDelegate {
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer
+    ) -> Bool {
+        true
     }
 }
 
