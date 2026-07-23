@@ -118,13 +118,19 @@ extension WatchViewController: UICollectionViewDelegate {
         shouldSelectItemAt indexPath: IndexPath
     )
         -> Bool {
-        // Swallow taps fired while either the outer scroll view OR the
-        // related list itself is still flinging — a tap landing during
-        // the collection's own deceleration is the accidental-play case.
-        !isOuterScrollViewDragging
+        // Swallow taps fired while either scroll view is still flinging,
+        // and for a short window after any scroll movement — touching to
+        // stop momentum, or a sub-threshold drag, is browsing, not a play
+        // request. In portrait the related list itself doesn't scroll
+        // (the outer scroll view does), so the time window is what
+        // actually catches the accidental taps there.
+        let sinceScroll = ProcessInfo.processInfo.systemUptime
+            - lastScrollActivity
+        return !isOuterScrollViewDragging
             && !scrollView.isDecelerating
             && !collectionView.isDragging
             && !collectionView.isDecelerating
+            && sinceScroll > 0.3
     }
 
     func collectionView(
@@ -200,6 +206,10 @@ extension WatchViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(
         _ scrollView: UIScrollView
     ) {
+        if scrollView === self.scrollView
+            || scrollView === relatedCollectionView {
+            lastScrollActivity = ProcessInfo.processInfo.systemUptime
+        }
         guard scrollView === self.scrollView else {
             return
         }

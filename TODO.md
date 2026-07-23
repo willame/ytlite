@@ -20,9 +20,11 @@
 - 根因：`AVPlayer.play()`（播放器/锁屏/PiP/迷你面板 4 处 resume）强制 rate=1.0。
 - 解法：在已有 `rate` KVO 里加**唯一一处**对账 `reapplySpeedIfReset`——播放中速率偏离选定档位即纠正回来，覆盖全部 resume 路径。`VideoPlayerView+Playback.swift`。
 
-### 相关视频误触 — 拦截滚动惯性期点击
-- 根因：原 `shouldSelectItemAt` 只查外层 scrollView 减速，内层 `relatedCollectionView` 自身滚动惯性没拦。
-- 解法：guard 追加 `!collectionView.isDragging && !collectionView.isDecelerating`。`WatchViewController+CollectionDelegates.swift`。
+### 相关视频误触 — 滚动冷却窗口（v2，v1 未根治）
+- v1 只加了内层 collection 的 `isDragging/isDecelerating`——但竖屏下相关列表 `isScrollEnabled=false`（外层 scrollView 才滚），该 guard 恒 false 无效；且 `scrollView.delaysContentTouches=false` 触摸零延迟，天生敏感。
+- v2 真因假设：惯性滚动中/刚停时点一下停住列表、或按下轻微移动没到滚动阈值就抬手，被判成播放。tap 抬手那刻滚动状态已清零，guard 抓不到。
+- v2 解法：记录 `lastScrollActivity`（外层+内层任一滚动即更新，用 `ProcessInfo.systemUptime` 单调时钟），`shouldSelectItemAt` 距上次滚动 <0.3s 则吞掉。`WatchViewController.swift` + `+CollectionDelegates.swift`。
+- 仍未覆盖：无任何前置滚动的纯静止轻触（H1）。若 v2 后仍敏感，下一档是 `delaysContentTouches=true` 或给 cell 换带移动容差的 tap 手势。
 
 ### 遗留小清理（非阻塞）
 - `player.speed.normal` 本地化 key 在 12 个 `.lproj/Localizable.strings` 中已无代码引用，可后续统一删除（本轮未动，避免为一个 key 扫 12 个语言文件）。

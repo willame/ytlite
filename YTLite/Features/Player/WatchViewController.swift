@@ -67,6 +67,11 @@ final class WatchViewController: UIViewController {
     let playbackFacade = PlaybackFacade()
     var pageLoadToken = CancellationToken()
     var isOuterScrollViewDragging = false
+    /// Timestamp of the last scroll movement (outer scroll view or the
+    /// related list). A tap landing within a short window after scrolling
+    /// — e.g. touching to stop momentum — is treated as browsing, not a
+    /// play request.
+    var lastScrollActivity: CFTimeInterval = 0
     var didSeekToSavedPosition = false
     var captionTracks: [SubtitleTrack] = []
     var activeSubtitleLanguage: String?
