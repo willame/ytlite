@@ -236,22 +236,62 @@ extension VideoPlayerView {
     private func setupSpeedOverlay() {
         addSubview(speedOverlay)
         speedOverlay.addSubview(speedLabel)
-        speedOverlay.addSubview(speedSlider)
-        speedLabel.text = "player.speed.normal".localized
-        speedSlider.addTarget(
-            self,
-            action: #selector(speedSliderChanged(_:)),
-            for: .valueChanged
-        )
-        speedSlider.addTarget(
-            self,
-            action: #selector(speedSliderReleased(_:)),
-            for: [.touchUpInside, .touchUpOutside]
-        )
-        activateSpeedOverlayConstraints()
+        speedLabel.text = formatSpeedLabel(playbackSpeed)
+        let grid = makeSpeedPresetGrid()
+        speedOverlay.addSubview(grid)
+        activateSpeedOverlayConstraints(grid: grid)
+        updateSpeedSelection()
     }
 
-    private func activateSpeedOverlayConstraints() {
+    private func makeSpeedPresetGrid() -> UIStackView {
+        let rows = stride(
+            from: 0,
+            to: speedPresets.count,
+            by: 3
+        ).map { start -> UIStackView in
+            let end = min(start + 3, speedPresets.count)
+            let chips = (start..<end).map { makeSpeedChip(index: $0) }
+            let row = UIStackView(arrangedSubviews: chips)
+            row.axis = .horizontal
+            row.distribution = .fillEqually
+            row.spacing = 8
+            return row
+        }
+        let grid = UIStackView(arrangedSubviews: rows)
+        grid.axis = .vertical
+        grid.spacing = 8
+        grid.translatesAutoresizingMaskIntoConstraints = false
+        return grid
+    }
+
+    private func makeSpeedChip(index: Int) -> UIButton {
+        let button = UIButton(type: .system)
+        button.tag = index
+        button.setTitle(
+            formatSpeedChip(speedPresets[index]),
+            for: .normal
+        )
+        button.titleLabel?.font = .systemFont(
+            ofSize: 14,
+            weight: .semibold
+        )
+        button.layer.cornerRadius = 14
+        button.layer.masksToBounds = true
+        button.heightAnchor.constraint(
+            equalToConstant: 32
+        ).isActive = true
+        button.addTarget(
+            self,
+            action: #selector(speedPresetTapped(_:)),
+            for: .touchUpInside
+        )
+        speedButtons.append(button)
+        return button
+    }
+
+    private func activateSpeedOverlayConstraints(
+        grid: UIStackView
+    ) {
         NSLayoutConstraint.activate([
             speedOverlay.topAnchor.constraint(
                 equalTo: speedButton.bottomAnchor,
@@ -262,34 +302,37 @@ extension VideoPlayerView {
             ),
             speedOverlay.widthAnchor.constraint(
                 equalToConstant: 220
-            ),
-            speedOverlay.heightAnchor.constraint(
-                equalToConstant: 60
             )
         ])
-        activateSpeedContentConstraints()
+        activateSpeedContentConstraints(grid: grid)
     }
 
-    private func activateSpeedContentConstraints() {
+    private func activateSpeedContentConstraints(
+        grid: UIStackView
+    ) {
         NSLayoutConstraint.activate([
             speedLabel.topAnchor.constraint(
                 equalTo: speedOverlay.topAnchor,
-                constant: 8
+                constant: 10
             ),
             speedLabel.centerXAnchor.constraint(
                 equalTo: speedOverlay.centerXAnchor
             ),
-            speedSlider.topAnchor.constraint(
+            grid.topAnchor.constraint(
                 equalTo: speedLabel.bottomAnchor,
-                constant: 4
+                constant: 10
             ),
-            speedSlider.leadingAnchor.constraint(
+            grid.leadingAnchor.constraint(
                 equalTo: speedOverlay.leadingAnchor,
-                constant: 16
+                constant: 12
             ),
-            speedSlider.trailingAnchor.constraint(
+            grid.trailingAnchor.constraint(
                 equalTo: speedOverlay.trailingAnchor,
-                constant: -16
+                constant: -12
+            ),
+            grid.bottomAnchor.constraint(
+                equalTo: speedOverlay.bottomAnchor,
+                constant: -12
             )
         ])
     }

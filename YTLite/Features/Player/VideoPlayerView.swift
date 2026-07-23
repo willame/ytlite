@@ -155,17 +155,10 @@ final class VideoPlayerView: UIView {
         return overlay
     }()
 
-    let speedSlider: UISlider = {
-        let slider = UISlider()
-        slider.minimumValue = 0.25
-        slider.maximumValue = 2.0
-        slider.value = 1.0
-        slider.minimumTrackTintColor = .white
-        slider.maximumTrackTintColor = UIColor.white
-            .withAlphaComponent(0.3)
-        slider.translatesAutoresizingMaskIntoConstraints = false
-        return slider
-    }()
+    /// Tappable preset speeds shown as chips in the overlay.
+    let speedPresets: [Float] = [0.5, 1.0, 1.25, 1.5, 1.75, 2.0]
+    /// The chip buttons, kept so selection highlighting can be refreshed.
+    var speedButtons: [UIButton] = []
 
     let speedLabel: UILabel = {
         let label = UILabel()

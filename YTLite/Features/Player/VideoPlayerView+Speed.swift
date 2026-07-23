@@ -10,51 +10,56 @@ extension VideoPlayerView {
         if !isVisible {
             pauseAutoHide()
         } else {
+            speedLabel.text = formatSpeedLabel(playbackSpeed)
+            updateSpeedSelection()
             scheduleAutoHide()
         }
     }
 
     @objc
-    func speedSliderChanged(_ slider: UISlider) {
-        let snapped = snapToSteps(slider.value)
-        slider.value = snapped
-        playbackSpeed = snapped
-        speedLabel.text = formatSpeedLabel(snapped)
-    }
-
-    @objc
-    func speedSliderReleased(_ slider: UISlider) {
-        let snapped = snapToSteps(slider.value)
-        slider.value = snapped
-        playbackSpeed = snapped
-    }
-
-    func formatSpeedLabel(_ speed: Float) -> String {
-        speed == 1.0
-            ? "player.speed.normal".localized
-            : String(format: "%.2g", speed) + "x"
-    }
-
-    func snapToSteps(_ value: Float) -> Float {
-        let steps: [Float] = [
-            0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0
-        ]
-        var closest = steps[0]
-        var minDiff = abs(value - closest)
-        for step in steps {
-            let diff = abs(value - step)
-            if diff < minDiff {
-                minDiff = diff
-                closest = step
-            }
+    func speedPresetTapped(_ sender: UIButton) {
+        guard speedPresets.indices.contains(sender.tag) else {
+            return
         }
-        return closest
+        playbackSpeed = speedPresets[sender.tag]
+        speedLabel.text = formatSpeedLabel(playbackSpeed)
+        updateSpeedSelection()
+        scheduleAutoHide()
+    }
+
+    /// Highlight the chip matching the active speed; dim the rest.
+    func updateSpeedSelection() {
+        for button in speedButtons {
+            guard speedPresets.indices.contains(button.tag) else {
+                continue
+            }
+            let selected = abs(
+                speedPresets[button.tag] - playbackSpeed
+            ) < 0.01
+            button.backgroundColor = selected
+                ? UIColor.white.withAlphaComponent(0.9)
+                : UIColor.white.withAlphaComponent(0.15)
+            button.setTitleColor(
+                selected ? .black : .white,
+                for: .normal
+            )
+        }
+    }
+
+    /// Big label above the chips, e.g. "1.50x".
+    func formatSpeedLabel(_ speed: Float) -> String {
+        String(format: "%.2f", speed) + "x"
+    }
+
+    /// Compact chip / control-bar label, e.g. "1x", "1.25x".
+    func formatSpeedChip(_ speed: Float) -> String {
+        speed == 1.0
+            ? "1x"
+            : String(format: "%g", speed) + "x"
     }
 
     func updateSpeedButtonTitle() {
-        let title = playbackSpeed == 1.0
-            ? "1x"
-            : String(format: "%.2g", playbackSpeed) + "x"
+        let title = formatSpeedChip(playbackSpeed)
         let attrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.boldSystemFont(ofSize: 10),
             .foregroundColor: UIColor.white

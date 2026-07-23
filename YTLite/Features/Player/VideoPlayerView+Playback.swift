@@ -131,11 +131,27 @@ extension VideoPlayerView {
         rateObservation = player.observe(
             \.rate,
             options: [.new]
-        ) { [weak self] _, _ in
+        ) { [weak self] observed, _ in
             DispatchQueue.main.async {
+                self?.reapplySpeedIfReset(on: observed)
                 self?.updatePlayPauseIcon()
             }
         }
+    }
+
+    /// `AVPlayer.play()` — invoked by the play button, lock screen, PiP and
+    /// the mini panel alike — forces `rate` back to 1.0, silently dropping
+    /// the user's chosen speed on every resume. This is the single point
+    /// that reconciles the live rate back to the intended `playbackSpeed`,
+    /// keeping speed sticky across pause without a fresh 1.0 tap.
+    private func reapplySpeedIfReset(on player: AVPlayer) {
+        guard playbackSpeed != 1.0,
+              player.rate > 0,
+              abs(player.rate - playbackSpeed) > 0.01
+        else {
+            return
+        }
+        player.rate = playbackSpeed
     }
 
     private func observeTimeControl(on player: AVPlayer) {

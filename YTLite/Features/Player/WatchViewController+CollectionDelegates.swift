@@ -118,8 +118,13 @@ extension WatchViewController: UICollectionViewDelegate {
         shouldSelectItemAt indexPath: IndexPath
     )
         -> Bool {
+        // Swallow taps fired while either the outer scroll view OR the
+        // related list itself is still flinging — a tap landing during
+        // the collection's own deceleration is the accidental-play case.
         !isOuterScrollViewDragging
             && !scrollView.isDecelerating
+            && !collectionView.isDragging
+            && !collectionView.isDecelerating
     }
 
     func collectionView(

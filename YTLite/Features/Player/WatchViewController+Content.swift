@@ -265,7 +265,10 @@ extension WatchViewController {
                 title: page.playlistTitle
             )
             queue.seekTo(videoId: page.video.id)
-        } else {
+        } else if !queue.isUserQueue {
+            // A user-built queue (Play next / Add to queue) must survive
+            // manual navigation to a video that isn't in it — only clear
+            // playlist/auto queues here.
             queue.clear()
         }
     }
