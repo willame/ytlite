@@ -20,11 +20,15 @@
 - 根因：`AVPlayer.play()`（播放器/锁屏/PiP/迷你面板 4 处 resume）强制 rate=1.0。
 - 解法：在已有 `rate` KVO 里加**唯一一处**对账 `reapplySpeedIfReset`——播放中速率偏离选定档位即纠正回来，覆盖全部 resume 路径。`VideoPlayerView+Playback.swift`。
 
-### 相关视频误触 — 滚动冷却窗口（v2，v1 未根治）
-- v1 只加了内层 collection 的 `isDragging/isDecelerating`——但竖屏下相关列表 `isScrollEnabled=false`（外层 scrollView 才滚），该 guard 恒 false 无效；且 `scrollView.delaysContentTouches=false` 触摸零延迟，天生敏感。
-- v2 真因假设：惯性滚动中/刚停时点一下停住列表、或按下轻微移动没到滚动阈值就抬手，被判成播放。tap 抬手那刻滚动状态已清零，guard 抓不到。
-- v2 解法：记录 `lastScrollActivity`（外层+内层任一滚动即更新，用 `ProcessInfo.systemUptime` 单调时钟），`shouldSelectItemAt` 距上次滚动 <0.3s 则吞掉。`WatchViewController.swift` + `+CollectionDelegates.swift`。
-- 仍未覆盖：无任何前置滚动的纯静止轻触（H1）。若 v2 后仍敏感，下一档是 `delaysContentTouches=true` 或给 cell 换带移动容差的 tap 手势。
+### 相关视频误触 — 三轮修法，真因=选中 vs 点击手势
+- v1（无效）：只加内层 collection 的 `isDragging/isDecelerating`——竖屏下相关列表 `isScrollEnabled=false`，该 guard 恒 false。
+- v2（修好"滑动/惯性期误触"）：`lastScrollActivity` 冷却窗口，点击距上次滚动 <0.3s 则吞掉。命中"点一下停住惯性滚动"场景。**已验证有效**。
+- **真因（v3）**：播放走 `UICollectionView` 选中（`didSelectItemAt`，触摸抬起即触发，**对按压时长无要求**）——手指停留再抬起也算选中，故"轻碰/停留即播"，比原版 YouTube 敏感得多（YT 用点击手势语义，长停留不触发）。
+- v3 解法：
+  - `VideoCell` 加 `onTap` + `UITapGestureRecognizer`（`cancelsTouchesInView=false` 不干扰其它复用 VideoCell 的控制器；`shouldReceive` 排除频道头像/名；tap 与其它手势互斥防双触发）。长停留≥0.4s 落入既有 long-press（队列菜单）而非播放。
+  - `relatedCollectionView.allowsSelection=false` 关掉选中式播放，改由 tap 驱动；`handleRelatedTap` 保留 v2 冷却门（防惯性-停）。
+  - 移除 `shouldSelectItemAt`/`didSelectItemAt`。
+  - 文件：`VideoCell.swift`、`+CollectionDelegates.swift`、`+Layout.swift`。
 
 ### 遗留小清理（非阻塞）
 - `player.speed.normal` 本地化 key 在 12 个 `.lproj/Localizable.strings` 中已无代码引用，可后续统一删除（本轮未动，避免为一个 key 扫 12 个语言文件）。

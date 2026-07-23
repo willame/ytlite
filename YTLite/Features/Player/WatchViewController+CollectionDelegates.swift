@@ -72,6 +72,9 @@ extension WatchViewController: UICollectionViewDataSource {
         cell.onLongPress = { [weak self] in
             self?.presentQueueMenu(for: video)
         }
+        cell.onTap = { [weak self] in
+            self?.handleRelatedTap(video)
+        }
         return cell
     }
 
@@ -113,38 +116,19 @@ extension WatchViewController: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 
 extension WatchViewController: UICollectionViewDelegate {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        shouldSelectItemAt indexPath: IndexPath
-    )
-        -> Bool {
-        // Swallow taps fired while either scroll view is still flinging,
-        // and for a short window after any scroll movement — touching to
-        // stop momentum, or a sub-threshold drag, is browsing, not a play
-        // request. In portrait the related list itself doesn't scroll
-        // (the outer scroll view does), so the time window is what
-        // actually catches the accidental taps there.
+    /// Play is triggered by the cell's tap gesture (VideoCell.setupTap), not
+    /// selection, so a long resting touch no longer counts as a tap. Still
+    /// reject a tap landing within a short window after scrolling — touching
+    /// to stop momentum, or a sub-threshold drag, is browsing, not a play
+    /// request.
+    func handleRelatedTap(_ video: Video) {
         let sinceScroll = ProcessInfo.processInfo.systemUptime
             - lastScrollActivity
-        return !isOuterScrollViewDragging
-            && !scrollView.isDecelerating
-            && !collectionView.isDragging
-            && !collectionView.isDecelerating
-            && sinceScroll > 0.3
-    }
-
-    func collectionView(
-        _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
-        let video: Video? = if isPlaylistMode {
-            indexPath.section == 0
-                ? queue.videos[safe: indexPath.item + 1]
-                : visibleRelatedVideos[safe: indexPath.item]
-        } else {
-            visibleRelatedVideos[safe: indexPath.item]
-        }
-        guard let video else {
+        guard !isOuterScrollViewDragging,
+              !scrollView.isDecelerating,
+              !relatedCollectionView.isDecelerating,
+              sinceScroll > 0.3
+        else {
             return
         }
         navigateTo(video)

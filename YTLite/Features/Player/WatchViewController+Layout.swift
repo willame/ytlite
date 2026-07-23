@@ -305,6 +305,10 @@ extension WatchViewController {
         rv.delegate = self
         rv.translatesAutoresizingMaskIntoConstraints = false
         rv.isScrollEnabled = false
+        // Play is driven by each cell's tap gesture (see VideoCell.setupTap),
+        // which — unlike selection — ignores long rests. Turn selection off so
+        // a touch-up never doubles as a play trigger.
+        rv.allowsSelection = false
         // Disable automatic inset adjustment: in portrait the outer scroll view manages
         // all scrolling; in landscape the sidebar is already positioned below the nav bar
         // via safeAreaLayoutGuide, so automatic adjustment would add a redundant top inset

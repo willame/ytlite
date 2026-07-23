@@ -23,6 +23,8 @@ class VideoCell: UICollectionViewCell {
     private var cachedTitleHeight: CGFloat = 0
     var onChannelTap: (() -> Void)?
     var onLongPress: (() -> Void)?
+    var onTap: (() -> Void)?
+    private weak var tapGesture: UITapGestureRecognizer?
 
     /// Force grid layout regardless of cell width.
     var forceGridLayout: Bool = false {
@@ -88,6 +90,7 @@ class VideoCell: UICollectionViewCell {
         progressFill.isHidden = true
         onChannelTap = nil
         onLongPress = nil
+        onTap = nil
     }
 }
 
@@ -127,6 +130,7 @@ extension VideoCell {
 
         setupInfoArea()
         setupLongPress()
+        setupTap()
         applyTheme()
     }
 
@@ -137,6 +141,24 @@ extension VideoCell {
         longPress.minimumPressDuration = 0.4
         longPress.delegate = self
         contentView.addGestureRecognizer(longPress)
+    }
+
+    /// Play is driven by a real tap gesture, not collection-view selection:
+    /// selection fires on any touch-up regardless of press duration, so
+    /// merely resting a finger and lifting used to trigger playback. A tap
+    /// gesture ignores long/heavy rests and drags, matching how the stock
+    /// app behaves. The delegate keeps it from firing on the channel row.
+    private func setupTap() {
+        let tap = UITapGestureRecognizer(
+            target: self, action: #selector(handleTap)
+        )
+        tap.delegate = self
+        // VideoCell is shared: other screens still play via collection-view
+        // selection (touch based). Don't consume the touch, or this gesture
+        // would break their selection — here it only fires onTap when set.
+        tap.cancelsTouchesInView = false
+        contentView.addGestureRecognizer(tap)
+        tapGesture = tap
     }
 
     private func setupInfoArea() {
@@ -293,6 +315,11 @@ extension VideoCell {
     }
 
     @objc
+    private func handleTap() {
+        onTap?()
+    }
+
+    @objc
     private func applyTheme() {
         let theme = ThemeManager.shared
         backgroundColor = theme.surface
@@ -309,7 +336,28 @@ extension VideoCell: UIGestureRecognizerDelegate {
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer
     ) -> Bool {
-        true
+        // Keep the play tap mutually exclusive with every other gesture, so a
+        // long rest that fires the queue long-press never also plays. The
+        // long-press still coexists with the scroll pan (neither is the tap).
+        if gestureRecognizer === tapGesture || other === tapGesture {
+            return false
+        }
+        return true
+    }
+
+    /// Keep the play tap from firing when the touch is on the channel
+    /// avatar / name — those have their own tap that opens the channel.
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldReceive touch: UITouch
+    ) -> Bool {
+        guard gestureRecognizer === tapGesture,
+              let touched = touch.view
+        else {
+            return true
+        }
+        return !touched.isDescendant(of: channelAvatarView)
+            && !touched.isDescendant(of: channelLabel)
     }
 }
 
